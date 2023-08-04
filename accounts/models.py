@@ -10,7 +10,7 @@ class Profile(BaseModel):  # 프로필
         ("DOCIOR", _("DOCTOR")),
         ("TRAINER", _("TRAINER")),
     ]
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=15)
     intro = models.CharField(max_length=100)
     type = models.CharField(max_length=15, choices=TYPE_CHOICES)  # user 유형
