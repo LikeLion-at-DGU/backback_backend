@@ -11,12 +11,8 @@ class BaseModel(models.Model):  # 생성, 수정 날짜
 
 
 class ReportBaseModel(BaseModel):  # 신고내용
-    REASON_CHOICES = [
-        # 신고 카테고리
-    ]
     writer = models.OneToOneField(User, on_delete=models.CASCADE)
-    reason = models.CharField(max_length=10, choices=REASON_CHOICES)
-    content = models.TextField(null=True, blank=True)
+    reason = models.CharField(max_length=50)
 
     class Meta:
         abstract = True

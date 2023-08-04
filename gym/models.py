@@ -5,8 +5,12 @@ from core.models import ReportBaseModel, BaseModel
 
 class Gym(BaseModel):  # 헬스장 홍보
     name = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
-    square_feet = models.PositiveIntegerField(default=0)
+    square_feet = models.DecimalField(decimal_places=1, max_digits=10)
     machines = models.JSONField()
+    longitude = models.DecimalField(decimal_places=10, max_digits=15)
+    latitude = models.DecimalField(decimal_places=10, max_digits=15)
+    address = models.CharField(max_length=100)
+    key = models.CharField(max_length=10)
 
 
 class GymReport(ReportBaseModel):  # 헬스장 신고
@@ -16,7 +20,7 @@ class GymReport(ReportBaseModel):  # 헬스장 신고
 class Review(BaseModel):  # 헬스장 리뷰
     gym = models.ForeignKey(Gym, on_delete=models.CASCADE)
     writer = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
-    content = models.TextField()
+    content = models.CharField(max_length=500)
 
 
 class ReviewReport(ReportBaseModel):  # 리뷰 신고
