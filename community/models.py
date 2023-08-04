@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from core.models import ReportBaseModel, BaseModel
+from django.utils.translation import gettext_lazy as _
 
 
 class Tag(BaseModel):  # 카테고리
@@ -8,18 +9,21 @@ class Tag(BaseModel):  # 카테고리
 
 
 class Post(BaseModel):  # 게시물
-    TYPE_CHOICES = []
-    title = models.CharField(max_length=50)
-    content = models.TextField(max_length=500)
+    TYPE_CHOICES = [
+        ("ORDINARY", _("ORDINARY")),
+        ("PRO", _("PRO")),
+    ]
     writer = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
+    title = models.CharField(max_length=50)
+    content = models.TextField()
     tags = models.ManyToManyField(Tag, related_name="posts", blank=True)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
 
-    def get_reaction_count(self):  # 멘티 무지 이슈(좋아요 갯수)
+    def get_reaction_count(self):
         return self.reactions.filter(completed__isnull=True).count()
 
 
-class PostReport(ReportBaseModel):  # 게시물 신고
+class PostReport(ReportBaseModel):
     post = models.ForeignKey(Post, related_name="postreports", on_delete=models.CASCADE)
 
 
@@ -35,34 +39,34 @@ class Postimage(BaseModel):  # 게시물 이미지
 
 
 class Completed(BaseModel):  # 오운완 게시물
+    writer = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     content = models.TextField(max_length=500)
     image = models.ImageField(upload_to="post/", blank=True, null=True)
-    writer = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
 
-    def get_reaction_count(self):  # 멘티 무지 이슈(좋아요 갯수)
+    def get_reaction_count(self):
         return self.reactions.filter(post__isnull=True).count()
 
 
-class CompletedReport(ReportBaseModel):  # 오운완 게시물 신고
+class CompletedReport(ReportBaseModel):
     completed = models.ForeignKey(
         Completed, related_name="completedreports", on_delete=models.CASCADE
     )
 
 
-class Comment(BaseModel):  # 게시물 댓글
+class Comment(BaseModel):
+    writer = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     content = models.TextField(max_length=500)
-    author = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, null=False, blank=False, on_delete=models.CASCADE)
 
 
-class CommentReport(ReportBaseModel):  # 댓글 신고
+class CommentReport(ReportBaseModel):
     comment = models.ForeignKey(
         Comment, related_name="commentreports", on_delete=models.CASCADE
     )
 
 
-class Reaction(BaseModel):  # 좋아요
+class Reaction(BaseModel):
     user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     post = models.ForeignKey(
         Post, null=True, related_name="reactions", on_delete=models.CASCADE
@@ -72,7 +76,7 @@ class Reaction(BaseModel):  # 좋아요
     )
 
 
-class Scrap(BaseModel):  # 퍼가기
+class Scrap(BaseModel):
     user = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     post = models.ForeignKey(
         Post, null=True, related_name="scraps", on_delete=models.CASCADE
