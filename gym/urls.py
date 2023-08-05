@@ -1,12 +1,7 @@
-from django.urls import include, path
+from django.urls import path
 from .views import *
-from rest_framework import routers
-
+from . import views
 app_name = "gym"
-
-default_router = routers.SimpleRouter()
-default_router.register("gyms", GymViewSet, basename="gyms")
-
 urlpatterns = [
-    path("api/", include(default_router.urls)),
+    
 ]
