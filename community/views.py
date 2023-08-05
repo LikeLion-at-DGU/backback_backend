@@ -23,9 +23,9 @@ class CompleletedViewSet(viewsets.ModelViewSet):
         return CompletedSerializer
 
     def get_permissions(self):
-        if self.action in ["update", "partial_update", "destroy", "completed_reports"]:
+        if self.action in ["update", "partial_update", "destroy"]:
             return [IsOwnerOrReadOnly()]
-        elif self.action in ["likes"]:
+        elif self.action in ["likes", "completed_reports"]:
             return [IsAuthenticated()]
         return []
 
