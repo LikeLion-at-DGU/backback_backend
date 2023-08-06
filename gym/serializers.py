@@ -14,7 +14,7 @@ class GymSerializer(serializers.ModelSerializer):
             "address",
             "image",
         ]
-        read_only_field = ["created_at", "updated_at"]
+        read_only_field = ["id", "created_at", "updated_at"]
 
 
 class GymListSerializer(serializers.ModelSerializer):
@@ -29,11 +29,11 @@ class GymListSerializer(serializers.ModelSerializer):
             "address",
             "image",
         ]
-        read_only_field = ["created_at", "updated_at"]
+        read_only_field = ["id", "created_at", "updated_at"]
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ["writer", "content"]
-        read_only_field = ["created_at", "updated_at"]
+        read_only_field = ["id", "created_at", "updated_at"]
