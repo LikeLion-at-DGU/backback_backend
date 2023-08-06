@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import *
 
 
-class CompletedListSerializer(serializers.ModelSerializer):
+class CompletedSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True, required=False)
     writer = serializers.SerializerMethodField()
 
@@ -20,7 +20,7 @@ class CompletedListSerializer(serializers.ModelSerializer):
         read_only_fields = ["writer"]
 
 
-class CompletedSerializer(serializers.ModelSerializer):
+class CompletedEditSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True, read_only=True)
     writer = serializers.SerializerMethodField()
 

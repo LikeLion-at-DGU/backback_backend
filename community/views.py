@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser
 
 from .models import Completed, Reaction, CompletedReport
-from .serializers import CompletedListSerializer, CompletedSerializer
+from .serializers import CompletedSerializer, CompletedEditSerializer
 from .paginations import CompletedPagination
 from .permissions import IsOwnerOrReadOnly
 
@@ -18,8 +18,8 @@ class CompleletedViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser]
 
     def get_serializer_class(self):
-        if self.action in ["list", "create"]:
-            return CompletedListSerializer
+        if self.action in ["update", "partial_update"]:
+            return CompletedEditSerializer
         return CompletedSerializer
 
     def get_permissions(self):
