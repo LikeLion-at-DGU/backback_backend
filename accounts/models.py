@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from core.models import ReportBaseModel, BaseModel
 from django.utils.translation import gettext_lazy as _
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 
 class Profile(BaseModel):  # 프로필
@@ -17,6 +19,15 @@ class Profile(BaseModel):  # 프로필
     followings = models.ManyToManyField(
         "self", related_name="followers", symmetrical=False, blank=True
     )
+
+    @receiver(post_save, sender=User)
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            Profile.objects.create(user=instance)
+
+    @receiver(post_save, sender=User)
+    def save_user_profile(sender, instance, **kwargs):
+        instance.profile.save()
 
 
 class ProfileReport(ReportBaseModel):
