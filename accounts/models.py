@@ -2,8 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from core.models import ReportBaseModel, BaseModel
 from django.utils.translation import gettext_lazy as _
-from django.dispatch import receiver
-from django.db.models.signals import post_save
 
 
 class Profile(BaseModel):
@@ -12,7 +10,6 @@ class Profile(BaseModel):
         ("DOCIOR", _("DOCTOR")),
         ("TRAINER", _("TRAINER")),
     ]
-
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     intro = models.CharField(max_length=100)
     following = models.ManyToManyField(
@@ -20,16 +17,7 @@ class Profile(BaseModel):
     )
     type = models.CharField(max_length=15, choices=TYPE_CHOICES)
     nickname = models.CharField(max_length=15)
-    info = models.JSONField(default="{}")
-
-    @receiver(post_save, sender=User)
-    def create_user_profile(sender, instance, created, **kwargs):
-        if created:
-            Profile.objects.create(user=instance)
-
-    @receiver(post_save, sender=User)
-    def save_user_profile(sender, instance, **kwargs):
-        instance.profile.save()
+    info = models.JSONField(default={})
 
 
 class ProfileReport(ReportBaseModel):
