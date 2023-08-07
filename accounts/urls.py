@@ -8,4 +8,7 @@ app_name = "accounts"
 default_router = routers.SimpleRouter()
 default_router.register("profiles", ProfileViewSet, basename="profiles")
 
-urlpatterns = [path("", include(default_router.urls))]
+urlpatterns = [
+    path("", include(default_router.urls)),
+    path("me/", MeViewSet.as_view(), name="me"),
+]

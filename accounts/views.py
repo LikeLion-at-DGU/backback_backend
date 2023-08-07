@@ -1,8 +1,7 @@
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, generics
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import action, permission_classes
 from django.shortcuts import render, get_object_or_404
+from django.core.exceptions import PermissionDenied
 from .models import Profile
 from .serializers import *
 
@@ -16,10 +15,34 @@ class ProfileViewSet(
 ):
     queryset = Profile.objects.all()
 
-    @action(["GET"], detail=False, url_path="me")
-    @permission_classes([IsAuthenticated])
-    def my_profile(self, request):
-        user = request.user
-        profile = get_object_or_404(Profile, user=user)
-        serializers = ProfileSerializer(profile)
-        return Response(serializers.data)
+
+class MeViewSet(generics.RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
+    http_method_names = ["get", "patch"]
+
+    def get_object(self):
+        if not self.request.user.is_active:
+            raise PermissionDenied
+        return get_object_or_404(
+            User.objects.select_related("profile"), id=self.request.user.id
+        )
+
+    def get(self, request, *args, **kwargs):
+        instance: User = self.get_object()
+        serializer = self.get_serializer(instance)
+        profile_data = serializer.data.get("profile")
+        return Response(profile_data)
+
+    def patch(self, request, *args, **kwargs):
+        instance: User = self.get_object()
+        nickname = request.data.get("nickname")
+        intro = request.data.get("intro")
+
+        profile = instance.profile
+        profile.nickname = nickname
+        profile.intro = intro
+        profile.save()
+
+        serializer = self.get_serializer(instance)
+        profile_data = serializer.data.get("profile")
+        return Response(profile_data)
