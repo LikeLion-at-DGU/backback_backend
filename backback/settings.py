@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "community",
     "gym",
     "core",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
