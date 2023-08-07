@@ -9,72 +9,49 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 
 
-def find_gym(my_coor):
-    near = []
-    gym = Gym.objects.all()
-    for g in gym:
-        if haversine(my_coor, (g.latitude, g.longitude)) <= 3:
-            near.append(g.name)
-    return near
+# def find_gym(my_coor):
+#     near = []
+#     gym = Gym.objects.all()
+#     for g in gym:
+#         if haversine(my_coor, (g.latitude, g.longitude)) <= 3:
+#             near.append(g.name)
+#     return near
 
 
-class GymViewSet(
-    viewsets.GenericViewSet,
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    mixins.RetrieveModelMixin,
-):
-    queryset = Gym.objects.all()
-
-    def create(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        gym = serializer.instance
-        self.get_location(gym)
-        return Response(serializer.data)
-
-    def get_location(self, gym):
-        url = "https://dapi.kakao.com/v2/local/search/address.json?query=" + gym.address
-        headers = {"Authorization": "KakaoAK 6556fdbf5f3e592092dbd5678bb76f64"}
-        api_json = json.loads(str(requests.get(url, headers=headers).text))
-        address = api_json["documents"][0]["address"]
-        gym.latitude = float(address["y"])
-        gym.longitude = float(address["x"])
-        gym.save()
-
-    def get_serializer_class(self):
-        if self.action == "list":
-            return GymListSerializer
-        return GymSerializer
-
-    @action(["POST"], detail=True, url_path="reports")
-    def report(self, request):
-        gym = self.get_object()
-        GymReport.objects.create(
-            writer=request.user, gym=gym, reason=request.POST["reason"]
-        )
-        return Response()
-
-
-class ReviewViewSet(
-    viewsets.GenericViewSet,
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin,
-):
-    serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        gym = self.kwargs.get("gym_id")
-        queryset = Review.objects.filter(gym_id=gym)
-        return queryset
-
-    def create(self, request, gym_id=None):
-        gym = get_object_or_404(Gym, id=gym_id)
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(gym=gym)
-        return Response(serializer.data)
+# class GymViewSet(
+#     viewsets.GenericViewSet,
+#     mixins.ListModelMixin,
+#     mixins.CreateModelMixin,
+#     mixins.RetrieveModelMixin,
+# ):
+#     queryset = Gym.objects.all()
+#
+#     def create(self, request):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         self.perform_create(serializer)
+#         gym = serializer.instance
+#         self.get_location(gym)
+#         return Response(serializer.data)
+#
+#     def get_location(self, gym):
+#         url = "https://dapi.kakao.com/v2/local/search/address.json?query=" + gym.address
+#         headers = {"Authorization": "KakaoAK 6556fdbf5f3e592092dbd5678bb76f64"}
+#         api_json = json.loads(str(requests.get(url, headers=headers).text))
+#         address = api_json["documents"][0]["address"]
+#         gym.latitude = float(address["y"])
+#         gym.longitude = float(address["x"])
+#         gym.save()
+#
+#     def get_serializer_class(self):
+#         if self.action == "list":
+#             return GymListSerializer
+#         return GymSerializer
+#
+#     @action(["POST"], detail=True, url_path="reports")
+#     def report(self, request):
+#         gym = self.get_object()
+#         GymReport.objects.create(
+#             writer=request.user, gym=gym, reason=request.POST["reason"]
+#         )
+#         return Response()

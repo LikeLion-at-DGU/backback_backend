@@ -11,7 +11,7 @@ class BaseModel(models.Model):  # 생성, 수정 날짜
 
 
 class ReportBaseModel(BaseModel):  # 신고내용
-    writer = models.OneToOneField(User, on_delete=models.CASCADE)
+    writer = models.ForeignKey(User, on_delete=models.CASCADE)
     reason = models.CharField(max_length=50)
 
     class Meta:
