@@ -43,7 +43,7 @@ class GymViewSet(
         ["POST"],
         detail=True,
         url_path="reports",
-        permission_classes=[IsAuthenticated()],
+        permission_classes=[IsAuthenticated],
     )  # 신고
     def report(self, request):
         gym = self.get_object()
@@ -79,7 +79,7 @@ class ReviewViewSet(
         ["POST"],
         detail=True,
         url_path="reports",
-        permission_classes=[IsAuthenticated()],
+        permission_classes=[IsAuthenticated],
     )  # 신고
     def report(self, request):
         review = self.get_object()
