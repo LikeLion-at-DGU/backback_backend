@@ -45,11 +45,14 @@ class GymViewSet(
         url_path="reports",
         permission_classes=[IsAuthenticated],
     )  # 신고
-    def report(self, request):
+    def report(self, request, pk):
         gym = self.get_object()
-        reason = request.data.get("reason")
-        GymReport.objects.create(writer=request.user, gym=gym, reason=reason)
-        return Response(status=status.HTTP_200_OK)
+        gymreport = gym.reports.filter(writer=request.user)
+        if not gymreport.exists():
+            reason = request.data.get("reason")
+            GymReport.objects.create(writer=request.user, gym=gym, reason=reason)
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(["POST"], detail=False, url_path="use-location")  # 내 주변 헬스장
     def use_location(self, request):
@@ -81,11 +84,16 @@ class ReviewViewSet(
         url_path="reports",
         permission_classes=[IsAuthenticated],
     )  # 신고
-    def report(self, request):
+    def report(self, request, pk):
         review = self.get_object()
-        reason = request.data.get("reason")
-        ReviewReport.objects.create(writer=request.user, review=review, reason=reason)
-        return Response(status=status.HTTP_200_OK)
+        reviewreport = review.reports.filter(writer=request.user)
+        if not reviewreport.exists():
+            reason = request.data.get("reason")
+            ReviewReport.objects.create(
+                writer=request.user, review=review, reason=reason
+            )
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class GymReviewViewSet(
