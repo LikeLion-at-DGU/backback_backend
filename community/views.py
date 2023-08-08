@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.parsers import MultiPartParser
 
 
 class PostViewSet(
@@ -85,3 +86,60 @@ class PostViewSet(
         report = PostReport(writer=request.user, post=post)
         report.save()
         return Response({"detail": "게시글이 신고되었습니다."}, status=status.HTTP_201_CREATED)
+
+    @action(methods=["POST"], detail=True, url_path="like")
+    def like(self, request, pk=None):
+        post = self.get_object()
+        if reaction := Reaction.objects.filter(
+            completed__isnull=True, user=request.user, post=post
+        ).first():
+            reaction.delete()
+        else:
+            Reaction.objects.create(post=post, user=request.user)
+        return Response()
+
+
+class CompletedViewSet(viewsets.ModelViewSet):
+    queryset = Completed.objects.all()
+    pagination_class = CompletedPagination
+    parser_classes = [MultiPartParser]
+
+    def get_serializer_class(self):
+        if self.action in ["list"]:
+            return CompletedListSerializer
+        elif self.action in ["retrieve", "create"]:
+            return CompletedRetrieveCreateSerializer
+        return CompletedEditSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "reports", "likes"]:
+            return [IsAuthenticated()]
+        elif self.action in ["update", "partial_update", "destroy"]:
+            return [IsOwnerOrReadOnly()]
+        return []
+
+    def perform_create(self, serializer):
+        serializer.save(writer=self.request.user)
+
+    @action(methods=["POST"], detail=True, url_path="reports")
+    def reports(self, request, pk=None):
+        completed = self.get_object()
+        if CompletedReport.objects.filter(completed=completed, writer=request.user):
+            return Response(
+                {"detail": "이미 신고한 게시글입니다."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        CompletedReport.objects.create(
+            completed=completed, writer=request.user, reason=request.POST["reason"]
+        )
+        return Response()
+
+    @action(methods=["POST"], detail=True, url_path="like")
+    def like(self, request, pk=None):
+        completed = self.get_object()
+        if reaction := Reaction.objects.filter(
+            post__isnull=True, user=request.user, completed=completed
+        ).first():
+            reaction.delete()
+        else:
+            Reaction.objects.create(completed=completed, user=request.user)
+        return Response()

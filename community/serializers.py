@@ -23,7 +23,7 @@ class PurposeSerializer(serializers.ModelSerializer):
 
 
 class PostListSerializer(serializers.ModelSerializer):
-    # likes_cnt = serializers.SerializerMethodField()
+    likes_cnt = serializers.SerializerMethodField()
     # comments_cnt = serializers.SerializerMethodField()
     content = serializers.CharField(write_only=True)
     content_short = serializers.SerializerMethodField()
@@ -38,9 +38,12 @@ class PostListSerializer(serializers.ModelSerializer):
             "title",
             "content",
             "content_short",
-            # "likes_cnt",
+            "likes_cnt",
             # "comments_cnt",
         ]
+
+    def get_likes_cnt(self, instance):
+        return instance.reactions.count()
 
     def get_content_short(self, obj):
         return obj.content[:50] + "..." if len(obj.content) > 50 else obj.content
@@ -52,6 +55,7 @@ class PostListSerializer(serializers.ModelSerializer):
 class PostDetailSerializer(serializers.ModelSerializer):
     purposes = PurposeSerializer(many=True)
     exercises = ExerciseSerializer(many=True)
+    likes_cnt = serializers.SerializerMethodField()
     images = serializers.SerializerMethodField()
     is_clipped = serializers.SerializerMethodField()
     # comments_cnt = serializers.SerializerMethodField()
@@ -68,11 +72,14 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "title",
             "images",
             "content",
-            # "likes_cnt",
+            "likes_cnt",
             # "comments_cnt",
             # "is_liked",
             "is_clipped",
         ]
+
+    def get_likes_cnt(self, instance):
+        return instance.reactions.count()
 
     def get_images(self, obj):
         image = obj.postimages.all()
@@ -99,3 +106,53 @@ class ScrapSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scrap
         fields = "__all__"
+
+
+class CompletedListSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
+
+    class Meta:
+        model = Completed
+        fields = [
+            "writer",
+            "id",
+            "image",
+        ]
+
+
+class CompletedRetrieveCreateSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
+    likes_cnt = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Completed
+        fields = "__all__"
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "writer",
+            "likes_cnt",
+        ]
+
+    def get_likes_cnt(self, instance):
+        return instance.reactions.count()
+
+
+class CompletedEditSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True, read_only=True)
+    likes_cnt = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Completed
+        fields = "__all__"
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "writer",
+            "likes_cnt",
+        ]
+
+    def get_likes_cnt(self, instance):
+        return instance.reactions.count()

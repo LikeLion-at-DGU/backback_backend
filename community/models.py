@@ -48,3 +48,30 @@ class Scrap(BaseModel):
 
     class Meta:
         unique_together = ("user", "post")
+
+
+def completions_image_upload_path(instance, filename):
+    return f"completions/{instance.id}/{filename}"
+
+
+class Completed(BaseModel):
+    writer = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
+    title = models.CharField(max_length=50)
+    content = models.CharField(max_length=500)
+    image = models.ImageField(upload_to=completions_image_upload_path)
+
+
+class CompletedReport(ReportBaseModel):
+    completed = models.ForeignKey(
+        Completed, related_name="reports", on_delete=models.CASCADE
+    )
+
+
+class Reaction(BaseModel):
+    user = models.ForeignKey(User, related_name="reactions", on_delete=models.CASCADE)
+    post = models.ForeignKey(
+        Post, null=True, related_name="reactions", on_delete=models.CASCADE
+    )
+    completed = models.ForeignKey(
+        Completed, null=True, related_name="reactions", on_delete=models.CASCADE
+    )
