@@ -42,15 +42,8 @@ class PostListSerializer(serializers.ModelSerializer):
             # "comments_cnt",
         ]
 
-    def create(self, validated_data):
-        instance = Post.objects.create(**validated_data)
-        image_set = self.context["request"].FILES
-        for image_data in image_set.getlist("image"):
-            PostImage.objects.create(post=instance, image=image_data)
-        return instance
-
     def get_content_short(self, obj):
-        return obj.content[:5] + "..." if len(obj.content) > 5 else obj.content
+        return obj.content[:50] + "..." if len(obj.content) > 50 else obj.content
 
     # def get_comments_cnt(self, instance):
     #     return instance.comments.count()
@@ -84,6 +77,13 @@ class PostDetailSerializer(serializers.ModelSerializer):
     def get_images(self, obj):
         image = obj.postimages.all()
         return PostImageSerializer(instance=image, many=True, context=self.context).data
+
+    def create(self, validated_data):
+        instance = Post.objects.create(**validated_data)
+        image_set = self.context["request"].FILES
+        for image_data in image_set.getlist("image"):
+            PostImage.objects.create(post=instance, image=image_data)
+        return instance
 
     def get_is_clipped(self, obj):
         user = self.context["request"].user

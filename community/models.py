@@ -26,17 +26,17 @@ class Post(BaseModel):
 
 
 class PostReport(ReportBaseModel):
-    post = models.ForeignKey(Post, related_name="postreports", on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name="reports", on_delete=models.CASCADE)
 
 
 def image_upload_path(instance, filename):
-    return f"{instance.post.id}/{filename}"
+    return f"posts/{instance.post.id}/{filename}"
 
 
 class PostImage(BaseModel):
     image = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
     post = models.ForeignKey(
-        Post, related_name="postimages", null=True, on_delete=models.CASCADE
+        Post, related_name="images", null=True, on_delete=models.CASCADE
     )
 
 
