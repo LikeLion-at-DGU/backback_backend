@@ -69,8 +69,7 @@ class MeViewSet(generics.RetrieveUpdateAPIView):
     def get(self, request, *args, **kwargs):
         instance: User = self.get_object()
         serializer = self.get_serializer(instance.profile)
-        data = serializer.data
-        return Response(data)
+        return Response(serializer.data)
 
     def patch(self, request, *args, **kwargs):
         instance: User = self.get_object()
@@ -83,5 +82,4 @@ class MeViewSet(generics.RetrieveUpdateAPIView):
         profile.save()
 
         serializer = self.get_serializer(instance.profile)
-        data = serializer.data
-        return Response(data)
+        return Response(serializer.data)
