@@ -56,8 +56,8 @@ class ProfileViewSet(
 
 
 class MeViewSet(generics.RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
-    http_method_names = ["get", "patch"]
+    serializer_class = ProfileSerializer
+    http_method_names = ["get", "patch", "options"]
 
     def get_object(self):
         if not self.request.user.is_active:
@@ -68,9 +68,9 @@ class MeViewSet(generics.RetrieveUpdateAPIView):
 
     def get(self, request, *args, **kwargs):
         instance: User = self.get_object()
-        serializer = self.get_serializer(instance)
-        profile_data = serializer.data.get("profile")
-        return Response(profile_data)
+        serializer = self.get_serializer(instance.profile)
+        data = serializer.data
+        return Response(data)
 
     def patch(self, request, *args, **kwargs):
         instance: User = self.get_object()
@@ -82,6 +82,6 @@ class MeViewSet(generics.RetrieveUpdateAPIView):
         profile.intro = intro
         profile.save()
 
-        serializer = self.get_serializer(instance)
-        profile_data = serializer.data.get("profile")
-        return Response(profile_data)
+        serializer = self.get_serializer(instance.profile)
+        data = serializer.data
+        return Response(data)

@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 class Profile(BaseModel):
     TYPE_CHOICES = [
         ("COMMON", _("COMMON")),
-        ("DOCIOR", _("DOCTOR")),
+        ("DOCTOR", _("DOCTOR")),
         ("TRAINER", _("TRAINER")),
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -22,5 +22,5 @@ class Profile(BaseModel):
 
 class ProfileReport(ReportBaseModel):
     profile = models.ForeignKey(
-        Profile, related_name="profilereports", on_delete=models.CASCADE
+        Profile, related_name="reports", on_delete=models.CASCADE
     )

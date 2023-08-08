@@ -32,21 +32,3 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_follower_cnt(self, instance):
         return instance.followers.count()
-
-
-class UserSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer()
-
-    class Meta:
-        model = User
-        fields = ["profile"]
-
-    def update(self, instance, validated_data):
-        profile_data = validated_data.pop("profile")
-        profile = instance.profile
-
-        profile.nickname = profile_data.get("nickname", profile.nickname)
-        profile.intro = profile_data.get("intro", profile.intro)
-        profile.save()
-
-        return super().update(instance, validated_data)
