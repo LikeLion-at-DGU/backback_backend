@@ -37,6 +37,23 @@ class ProfileViewSet(
             user.profile.following.add(followed_user)
         return Response({}, status=status.HTTP_200_OK)
 
+    @action(["POST"], detail=True, url_path="report")
+    @permission_classes([IsAuthenticated])
+    def report(self, request, pk=None):
+        profile = self.get_object()
+        reason = request.data.get("reason")
+
+        if profile == request.user.profile:
+            return Response(
+                {"detail": "You cannot follow yourself."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        ProfileReport.objects.create(
+            writer=request.user, reason=reason, profile=profile
+        )
+        return Response()
+
 
 class MeViewSet(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
