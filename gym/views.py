@@ -32,7 +32,7 @@ class GymViewSet(
 ):
     queryset = Gym.objects.all()
     filter_backends = [SearchFilter]
-    search_fields = ["address", "^address"]  # 지역 헬스장 검색
+    search_fields = ["address"]  # 지역 헬스장 검색
 
     def get_serializer_class(self):
         if self.action == "list":
