@@ -14,6 +14,7 @@ class ProfileViewSet(
     mixins.UpdateModelMixin,
 ):
     queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
 
 
 class MeViewSet(generics.RetrieveUpdateAPIView):
