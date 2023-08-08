@@ -1,5 +1,8 @@
 from rest_framework import viewsets, mixins, generics
 from rest_framework.response import Response
+from rest_framework.decorators import action, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 from django.shortcuts import render, get_object_or_404
 from django.core.exceptions import PermissionDenied
 from .models import Profile
@@ -15,6 +18,24 @@ class ProfileViewSet(
 ):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+
+    @action(["POST"], detail=True, url_path="follow")
+    @permission_classes([IsAuthenticated])
+    def follow(self, request, pk=None):
+        user = request.user
+        followed_user = self.get_object()
+
+        if user.profile == followed_user:
+            return Response(
+                {"detail": "You cannot follow yourself."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if user.profile in followed_user.followers.all():
+            user.profile.following.remove(followed_user)
+        else:
+            user.profile.following.add(followed_user)
+        return Response({}, status=status.HTTP_200_OK)
 
 
 class MeViewSet(generics.RetrieveUpdateAPIView):
