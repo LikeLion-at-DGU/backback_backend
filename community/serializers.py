@@ -24,7 +24,7 @@ class PurposeSerializer(serializers.ModelSerializer):
 
 class PostListSerializer(serializers.ModelSerializer):
     # likes_cnt = serializers.SerializerMethodField()
-    # comments_cnt = serializers.SerializerMethodField()
+    comments_cnt = serializers.SerializerMethodField()
     content = serializers.CharField(write_only=True)
     content_short = serializers.SerializerMethodField()
 
@@ -39,14 +39,14 @@ class PostListSerializer(serializers.ModelSerializer):
             "content",
             "content_short",
             # "likes_cnt",
-            # "comments_cnt",
+            "comments_cnt",
         ]
 
     def get_content_short(self, obj):
         return obj.content[:50] + "..." if len(obj.content) > 50 else obj.content
 
-    # def get_comments_cnt(self, instance):
-    #     return instance.comments.count()
+    def get_comments_cnt(self, instance):
+        return instance.comments.count()
 
 
 class PostDetailSerializer(serializers.ModelSerializer):
@@ -54,7 +54,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
     exercises = ExerciseSerializer(many=True)
     images = serializers.SerializerMethodField()
     is_clipped = serializers.SerializerMethodField()
-    # comments_cnt = serializers.SerializerMethodField()
+    comments_cnt = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -69,13 +69,13 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "images",
             "content",
             # "likes_cnt",
-            # "comments_cnt",
+            "comments_cnt",
             # "is_liked",
             "is_clipped",
         ]
 
     def get_images(self, obj):
-        image = obj.postimages.all()
+        image = obj.images.all()
         return PostImageSerializer(instance=image, many=True, context=self.context).data
 
     def create(self, validated_data):
@@ -89,8 +89,8 @@ class PostDetailSerializer(serializers.ModelSerializer):
         user = self.context["request"].user
         return Scrap.objects.filter(user=user, post=obj).exists()
 
-    # def get_comments_cnt(self, instance):
-    #     return instance.comments.count()
+    def get_comments_cnt(self, instance):
+        return instance.comments.count()
 
 
 class ScrapSerializer(serializers.ModelSerializer):
@@ -99,3 +99,15 @@ class ScrapSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scrap
         fields = "__all__"
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = [
+            "writer",
+            "id",
+            "content",
+            "created_at",
+        ]
+        read_only_fields = ["post"]
