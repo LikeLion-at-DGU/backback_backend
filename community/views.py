@@ -111,8 +111,10 @@ class CommentViewSet(mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = Comment.objects.all()
 
     def get_permissions(self):
-        if self.action == ["destroy"]:
+        if self.action == "destroy":
             return [IsOwnerOrReadOnly()]
+        elif self.action == "reports":
+            return [IsAuthenticated()]
         return []
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
