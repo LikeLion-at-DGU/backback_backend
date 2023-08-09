@@ -12,6 +12,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser
+from django.db.models import Q, Count
 
 
 class PostViewSet(
@@ -25,7 +26,11 @@ class PostViewSet(
     pagination_class = PostPagination
     filter_backends = [SearchFilter, PostTypeFilter, FollowingUserPostFilter]
     search_fields = ["title", "content"]
-    queryset = Post.objects.all().order_by("-pk")
+    queryset = Post.objects.annotate(
+        likes_cnt=Count(
+            "reactions", filter=Q(reactions__completed__isnull=True), distinct=True
+        ),
+    ).order_by("-pk")
 
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
@@ -77,7 +82,7 @@ class PostViewSet(
         return Response(serializer.data)
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
-    def reports(self, request, pk=None):
+    def report(self, request, pk=None):
         post = self.get_object()
         if PostReport.objects.filter(writer=request.user, post=post).exists():
             return Response(
@@ -87,7 +92,12 @@ class PostViewSet(
         report.save()
         return Response({"detail": "게시글이 신고되었습니다."}, status=status.HTTP_201_CREATED)
 
-    @action(methods=["POST"], detail=True, url_path="like")
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="like",
+        permission_classes=[IsAuthenticated],
+    )
     def like(self, request, pk=None):
         post = self.get_object()
         if reaction := Reaction.objects.filter(
@@ -110,7 +120,7 @@ class CompletedViewSet(viewsets.ModelViewSet):
         return CompletedSerializer
 
     def get_permissions(self):
-        if self.action in ["create", "reports", "likes"]:
+        if self.action in ["create", "report", "like"]:
             return [IsAuthenticated()]
         elif self.action in ["update", "partial_update", "destroy"]:
             return [IsOwnerOrReadOnly()]
@@ -119,10 +129,12 @@ class CompletedViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
 
-    @action(methods=["POST"], detail=True, url_path="reports")
-    def reports(self, request, pk=None):
+    @action(methods=["POST"], detail=True, url_path="report")
+    def report(self, request, pk=None):
         completed = self.get_object()
-        if CompletedReport.objects.filter(completed=completed, writer=request.user):
+        if CompletedReport.objects.filter(
+            completed=completed, writer=request.user
+        ).exists():
             return Response(
                 {"detail": "이미 신고한 게시글입니다."}, status=status.HTTP_400_BAD_REQUEST
             )

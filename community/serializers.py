@@ -23,7 +23,7 @@ class PurposeSerializer(serializers.ModelSerializer):
 
 
 class PostListSerializer(serializers.ModelSerializer):
-    likes_cnt = serializers.SerializerMethodField()
+    likes_cnt = serializers.IntegerField(read_only=True)
     # comments_cnt = serializers.SerializerMethodField()
     content = serializers.CharField(write_only=True)
     content_short = serializers.SerializerMethodField()
@@ -42,9 +42,6 @@ class PostListSerializer(serializers.ModelSerializer):
             # "comments_cnt",
         ]
 
-    def get_likes_cnt(self, instance):
-        return instance.reactions.count()
-
     def get_content_short(self, obj):
         return obj.content[:50] + "..." if len(obj.content) > 50 else obj.content
 
@@ -55,7 +52,7 @@ class PostListSerializer(serializers.ModelSerializer):
 class PostDetailSerializer(serializers.ModelSerializer):
     purposes = PurposeSerializer(many=True)
     exercises = ExerciseSerializer(many=True)
-    likes_cnt = serializers.SerializerMethodField()
+    likes_cnt = serializers.IntegerField(read_only=True)
     images = serializers.SerializerMethodField()
     is_clipped = serializers.SerializerMethodField()
     # comments_cnt = serializers.SerializerMethodField()
@@ -77,9 +74,6 @@ class PostDetailSerializer(serializers.ModelSerializer):
             # "is_liked",
             "is_clipped",
         ]
-
-    def get_likes_cnt(self, instance):
-        return instance.reactions.count()
 
     def get_images(self, obj):
         image = obj.postimages.all()
