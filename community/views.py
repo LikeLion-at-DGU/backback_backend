@@ -105,11 +105,9 @@ class CompletedViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser]
 
     def get_serializer_class(self):
-        if self.action in ["list"]:
-            return CompletedListSerializer
-        elif self.action in ["retrieve", "create"]:
-            return CompletedRetrieveCreateSerializer
-        return CompletedEditSerializer
+        if self.action in ["list", "create"]:
+            return CompletedListCreateSerializer
+        return CompletedSerializer
 
     def get_permissions(self):
         if self.action in ["create", "reports", "likes"]:

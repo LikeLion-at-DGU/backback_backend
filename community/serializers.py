@@ -108,8 +108,10 @@ class ScrapSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CompletedListSerializer(serializers.ModelSerializer):
+class CompletedListCreateSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
+    title = serializers.CharField(write_only=True)
+    content = serializers.CharField(write_only=True)
 
     class Meta:
         model = Completed
@@ -117,29 +119,15 @@ class CompletedListSerializer(serializers.ModelSerializer):
             "writer",
             "id",
             "image",
+            "title",
+            "content",
         ]
-
-
-class CompletedRetrieveCreateSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(use_url=True)
-    likes_cnt = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Completed
-        fields = "__all__"
         read_only_fields = [
-            "id",
-            "created_at",
-            "updated_at",
             "writer",
-            "likes_cnt",
         ]
 
-    def get_likes_cnt(self, instance):
-        return instance.reactions.count()
 
-
-class CompletedEditSerializer(serializers.ModelSerializer):
+class CompletedSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True, read_only=True)
     likes_cnt = serializers.SerializerMethodField()
 
