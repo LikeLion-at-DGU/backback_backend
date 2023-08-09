@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from haversine import haversine
 from rest_framework import viewsets, mixins, status
-
 from community.permissions import IsOwnerOrReadOnly
+from gym.paginations import Pagination
 from .models import Gym, GymReport, Review, ReviewReport
 from .serializers import (
     GymListSerializer,
@@ -30,7 +30,8 @@ class GymViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
 ):
-    queryset = Gym.objects.all()
+    pagination_class = Pagination
+    queryset = Gym.objects.all().order_by("-created_at")
     filter_backends = [SearchFilter]
     search_fields = ["address"]  # 지역 헬스장 검색
 
@@ -101,6 +102,8 @@ class GymReviewViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
 ):
+    pagination_class = Pagination
+
     def get_serializer_class(self):
         if self.action == "list":
             return ReviewListSerializer
@@ -108,7 +111,7 @@ class GymReviewViewSet(
 
     def get_queryset(self):
         gym = self.kwargs.get("gym_id")
-        queryset = Review.objects.filter(gym_id=gym)
+        queryset = Review.objects.filter(gym_id=gym).order_by("-created_at")
         return queryset
 
     def get_permissions(self):
