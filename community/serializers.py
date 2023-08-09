@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from core.serializers import WriterSerializer
 from .models import *
 
 
@@ -23,6 +24,7 @@ class PurposeSerializer(serializers.ModelSerializer):
 
 
 class PostListSerializer(serializers.ModelSerializer):
+    writer = WriterSerializer(source="writer.profile")
     likes_cnt = serializers.IntegerField(read_only=True)
     comments_cnt = serializers.SerializerMethodField()
     content = serializers.CharField(write_only=True)
@@ -34,7 +36,7 @@ class PostListSerializer(serializers.ModelSerializer):
             "id",
             "created_at",
             "updated_at",
-            # "writer",
+            "writer",
             "title",
             "content",
             "content_short",
@@ -54,6 +56,7 @@ class PostListSerializer(serializers.ModelSerializer):
 
 
 class PostDetailSerializer(serializers.ModelSerializer):
+    writer = WriterSerializer(source="writer.profile")
     purposes = PurposeSerializer(many=True)
     exercises = ExerciseSerializer(many=True)
     likes_cnt = serializers.IntegerField(read_only=True)
@@ -68,7 +71,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "id",
             "created_at",
             "updated_at",
-            # "writer",
+            "writer",
             "purposes",
             "exercises",
             "title",
@@ -117,6 +120,7 @@ class ScrapSerializer(serializers.ModelSerializer):
 
 
 class CompletedListCreateSerializer(serializers.ModelSerializer):
+    writer = WriterSerializer(source="writer.profile")
     image = serializers.ImageField(use_url=True)
     title = serializers.CharField(write_only=True)
     content = serializers.CharField(write_only=True)
@@ -136,6 +140,7 @@ class CompletedListCreateSerializer(serializers.ModelSerializer):
 
 
 class CompletedSerializer(serializers.ModelSerializer):
+    writer = WriterSerializer(source="writer.profile")
     image = serializers.ImageField(use_url=True, read_only=True)
     likes_cnt = serializers.SerializerMethodField()
 
@@ -155,6 +160,8 @@ class CompletedSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    writer = WriterSerializer(source="writer.profile")
+
     class Meta:
         model = Comment
         fields = [
