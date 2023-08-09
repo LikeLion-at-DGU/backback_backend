@@ -139,7 +139,7 @@ class CompletedSerializer(serializers.ModelSerializer):
     def get_likes_cnt(self, instance):
         return instance.reactions.count()
 
-      
+
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment

@@ -92,7 +92,6 @@ class PostViewSet(
         report.save()
         return Response({"detail": "게시글이 신고되었습니다."}, status=status.HTTP_201_CREATED)
 
-
     @action(
         methods=["POST"],
         detail=True,
