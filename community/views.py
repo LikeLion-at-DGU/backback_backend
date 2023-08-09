@@ -45,6 +45,13 @@ class PostViewSet(
             return [IsOwnerOrReadOnly()]
         return [IsAuthenticatedOrReadOnly()]
 
+    def retrieve(self, request, pk=None):
+        instance = self.get_object()
+        instance.view_cnt += 1
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
     @action(
         detail=True, methods=["post", "delete"], permission_classes=[IsAuthenticated]
     )

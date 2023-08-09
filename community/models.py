@@ -23,6 +23,7 @@ class Post(BaseModel):
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     exercises = models.ManyToManyField(Exercise, related_name="posts", blank=True)
     purposes = models.ManyToManyField(Purpose, related_name="posts", blank=True)
+    view_cnt = models.IntegerField(default=0)
 
 
 class PostReport(ReportBaseModel):
