@@ -92,6 +92,7 @@ class PostViewSet(
         report.save()
         return Response({"detail": "게시글이 신고되었습니다."}, status=status.HTTP_201_CREATED)
 
+
     @action(
         methods=["POST"],
         detail=True,
@@ -153,3 +154,45 @@ class CompletedViewSet(viewsets.ModelViewSet):
         else:
             Reaction.objects.create(completed=completed, user=request.user)
         return Response()
+
+
+class PostCommentViewSet(
+    mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        post = self.kwargs.get("post_id")
+        queryset = Comment.objects.filter(post_id=post).order_by("-pk")
+        return queryset
+
+    def create(self, request, post_id=None):
+        post = get_object_or_404(Post, id=post_id)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(post=post)
+        return Response(serializer.data)
+
+
+class CommentViewSet(mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
+
+    def get_permissions(self):
+        if self.action == "destroy":
+            return [IsOwnerOrReadOnly()]
+        elif self.action == "reports":
+            return [IsAuthenticated()]
+        return []
+
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    def reports(self, request, pk=None):
+        comment = self.get_object()
+        if CommentReport.objects.filter(writer=request.user, comment=comment).exists():
+            return Response(
+                {"detail": "이미 신고한 댓글입니다."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        report = CommentReport(writer=request.user, comment=comment)
+        report.save()
+        return Response({"detail": "댓글이 신고되었습니다."}, status=status.HTTP_201_CREATED)

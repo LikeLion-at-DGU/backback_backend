@@ -74,4 +74,17 @@ class Reaction(BaseModel):
     )
     completed = models.ForeignKey(
         Completed, null=True, related_name="reactions", on_delete=models.CASCADE
+
+      
+class Comment(BaseModel):
+    writer = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
+    content = models.CharField(max_length=500)
+    post = models.ForeignKey(
+        Post, related_name="comments", null=False, blank=False, on_delete=models.CASCADE
+    )
+
+
+class CommentReport(ReportBaseModel):
+    comment = models.ForeignKey(
+        Comment, related_name="reports", on_delete=models.CASCADE
     )
