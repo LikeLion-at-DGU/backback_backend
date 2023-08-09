@@ -40,6 +40,10 @@ class PostListSerializer(serializers.ModelSerializer):
             "content_short",
             "likes_cnt",
             "comments_cnt",
+            "view_cnt",
+        ]
+        read_only_fields = [
+            "view_cnt",
         ]
 
     def get_content_short(self, obj):
@@ -56,6 +60,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
     is_clipped = serializers.SerializerMethodField()
     comments_cnt = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -71,9 +76,18 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "content",
             "likes_cnt",
             "comments_cnt",
-            # "is_liked",
+            "is_liked",
             "is_clipped",
+            "view_cnt",
         ]
+        read_only_fields = [
+            "view_cnt",
+        ]
+
+    def get_is_liked(self, instance):
+        return instance.reactions.filter(
+            completed__isnull=True, user=self.context["request"].user
+        ).exists()
 
     def get_images(self, obj):
         image = obj.images.all()

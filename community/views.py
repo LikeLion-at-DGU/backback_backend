@@ -45,6 +45,12 @@ class PostViewSet(
             return [IsOwnerOrReadOnly()]
         return [IsAuthenticatedOrReadOnly()]
 
+    def get_object(self):
+        obj = super().get_object()
+        obj.view_cnt += 1
+        obj.save()
+        return obj
+
     @action(
         detail=True, methods=["post", "delete"], permission_classes=[IsAuthenticated]
     )
