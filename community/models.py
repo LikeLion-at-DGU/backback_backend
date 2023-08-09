@@ -36,7 +36,7 @@ def image_upload_path(instance, filename):
 class PostImage(BaseModel):
     image = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
     post = models.ForeignKey(
-        Post, related_name="images", null=True, on_delete=models.CASCADE
+        Post, related_name="postimages", null=True, on_delete=models.CASCADE
     )
 
 
@@ -50,6 +50,32 @@ class Scrap(BaseModel):
         unique_together = ("user", "post")
 
 
+def completions_image_upload_path(instance, filename):
+    return f"completions/{instance.id}/{filename}"
+
+
+class Completed(BaseModel):
+    writer = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
+    title = models.CharField(max_length=50)
+    content = models.CharField(max_length=500)
+    image = models.ImageField(upload_to=completions_image_upload_path)
+
+
+class CompletedReport(ReportBaseModel):
+    completed = models.ForeignKey(
+        Completed, related_name="reports", on_delete=models.CASCADE
+    )
+
+
+class Reaction(BaseModel):
+    user = models.ForeignKey(User, related_name="reactions", on_delete=models.CASCADE)
+    post = models.ForeignKey(
+        Post, null=True, related_name="reactions", on_delete=models.CASCADE
+    )
+    completed = models.ForeignKey(
+        Completed, null=True, related_name="reactions", on_delete=models.CASCADE
+
+      
 class Comment(BaseModel):
     writer = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     content = models.CharField(max_length=500)

@@ -23,7 +23,7 @@ class PurposeSerializer(serializers.ModelSerializer):
 
 
 class PostListSerializer(serializers.ModelSerializer):
-    # likes_cnt = serializers.SerializerMethodField()
+    likes_cnt = serializers.IntegerField(read_only=True)
     comments_cnt = serializers.SerializerMethodField()
     content = serializers.CharField(write_only=True)
     content_short = serializers.SerializerMethodField()
@@ -38,7 +38,7 @@ class PostListSerializer(serializers.ModelSerializer):
             "title",
             "content",
             "content_short",
-            # "likes_cnt",
+            "likes_cnt",
             "comments_cnt",
         ]
 
@@ -52,6 +52,7 @@ class PostListSerializer(serializers.ModelSerializer):
 class PostDetailSerializer(serializers.ModelSerializer):
     purposes = PurposeSerializer(many=True)
     exercises = ExerciseSerializer(many=True)
+    likes_cnt = serializers.IntegerField(read_only=True)
     images = serializers.SerializerMethodField()
     is_clipped = serializers.SerializerMethodField()
     comments_cnt = serializers.SerializerMethodField()
@@ -68,7 +69,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "title",
             "images",
             "content",
-            # "likes_cnt",
+            "likes_cnt",
             "comments_cnt",
             # "is_liked",
             "is_clipped",
@@ -101,6 +102,44 @@ class ScrapSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class CompletedListCreateSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
+    title = serializers.CharField(write_only=True)
+    content = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = Completed
+        fields = [
+            "writer",
+            "id",
+            "image",
+            "title",
+            "content",
+        ]
+        read_only_fields = [
+            "writer",
+        ]
+
+
+class CompletedSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True, read_only=True)
+    likes_cnt = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Completed
+        fields = "__all__"
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "writer",
+            "likes_cnt",
+        ]
+
+    def get_likes_cnt(self, instance):
+        return instance.reactions.count()
+
+      
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
