@@ -36,7 +36,7 @@ def image_upload_path(instance, filename):
 class PostImage(BaseModel):
     image = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
     post = models.ForeignKey(
-        Post, related_name="postimages", null=True, on_delete=models.CASCADE
+        Post, related_name="images", null=True, on_delete=models.CASCADE
     )
 
 
