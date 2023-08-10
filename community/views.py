@@ -250,9 +250,5 @@ class CommentViewSet(mixins.DestroyModelMixin, viewsets.GenericViewSet):
 
 
 class BannerViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    queryset = Banner.objects.all().order_by("priority")
     serializer_class = BannerSerializer
-
-    def get_queryset(self):
-        if self.action == "list":
-            queryset = Banner.objects.all().order_by("priority")
-        return queryset
