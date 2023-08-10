@@ -108,7 +108,7 @@ def google_callback(request):
         "refresh_token": str(refresh),
     }
     response = JsonResponse(response_data)
-    response.set_cookie("access_token", access_token, max_age=60 * 60 * 2)
+    response.set_cookie("access_token", access_token, max_age=60 * 60 * 24 * 14)
     return response
 
 
@@ -204,7 +204,7 @@ def kakao_callback(request):
         "refresh_token": str(refresh),
     }
     response = JsonResponse(response_data)
-    response.set_cookie("access_token", access_token, max_age=60 * 60 * 2)
+    response.set_cookie("access_token", access_token, max_age=60 * 60 * 24 * 14)
     return response
 
 
