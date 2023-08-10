@@ -24,7 +24,7 @@ class PurposeSerializer(serializers.ModelSerializer):
 
 
 class PostListSerializer(serializers.ModelSerializer):
-    writer = WriterSerializer(source="writer.profile")
+    writer = WriterSerializer(source="writer.profile", read_only=True)
     likes_cnt = serializers.IntegerField(read_only=True)
     comments_cnt = serializers.SerializerMethodField()
     content = serializers.CharField(write_only=True)
@@ -56,14 +56,14 @@ class PostListSerializer(serializers.ModelSerializer):
 
 
 class PostDetailSerializer(serializers.ModelSerializer):
-    writer = WriterSerializer(source="writer.profile")
+    writer = WriterSerializer(source="writer.profile", read_only=True)
     purposes = PurposeSerializer(many=True)
     exercises = ExerciseSerializer(many=True)
     likes_cnt = serializers.IntegerField(read_only=True)
-    images = serializers.SerializerMethodField()
-    is_clipped = serializers.SerializerMethodField()
-    comments_cnt = serializers.SerializerMethodField()
-    is_liked = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField(read_only=True)
+    is_clipped = serializers.SerializerMethodField(read_only=True)
+    comments_cnt = serializers.SerializerMethodField(read_only=True)
+    is_liked = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Post
@@ -120,7 +120,7 @@ class ScrapSerializer(serializers.ModelSerializer):
 
 
 class CompletedListCreateSerializer(serializers.ModelSerializer):
-    writer = WriterSerializer(source="writer.profile")
+    writer = WriterSerializer(source="writer.profile", read_only=True)
     image = serializers.ImageField(use_url=True)
     title = serializers.CharField(write_only=True)
     content = serializers.CharField(write_only=True)
@@ -140,7 +140,7 @@ class CompletedListCreateSerializer(serializers.ModelSerializer):
 
 
 class CompletedSerializer(serializers.ModelSerializer):
-    writer = WriterSerializer(source="writer.profile")
+    writer = WriterSerializer(source="writer.profile", read_only=True)
     image = serializers.ImageField(use_url=True, read_only=True)
     likes_cnt = serializers.SerializerMethodField()
 
@@ -160,7 +160,7 @@ class CompletedSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    writer = WriterSerializer(source="writer.profile")
+    writer = WriterSerializer(source="writer.profile", read_only=True)
 
     class Meta:
         model = Comment

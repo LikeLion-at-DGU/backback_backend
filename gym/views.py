@@ -48,14 +48,17 @@ class GymViewSet(
     )  # 신고
     def report(self, request, pk):
         gym = self.get_object()
-        gymreport = gym.reports.filter(writer=request.user)
-        if not gymreport.exists():
-            reason = request.data.get("reason", default="그냥 신고합니다.")
-            GymReport.objects.create(writer=request.user, gym=gym, reason=reason)
+        if not gym.reports.filter(writer=request.user).exists():
+            GymReport.objects.create(
+                writer=request.user,
+                gym=gym,
+                reason=request.data.get("reason", "default"),
+            )
             return Response({"detail": "게시글이 신고되었습니다."}, status=status.HTTP_200_OK)
         return Response(
             {"detail": "이미 신고한 게시글입니다."}, status=status.HTTP_400_BAD_REQUEST
         )
+
 
     @action(["POST"], detail=False, url_path="use-location")  # 내 주변 헬스장
     def use_location(self, request):
@@ -89,11 +92,11 @@ class ReviewViewSet(
     )  # 신고
     def report(self, request, pk):
         review = self.get_object()
-        reviewreport = review.reports.filter(writer=request.user)
-        if not reviewreport.exists():
-            reason = request.data.get("reason", default="그냥 신고합니다.")
+        if not review.reports.filter(writer=request.user).exists():
             ReviewReport.objects.create(
-                writer=request.user, review=review, reason=reason
+                writer=request.user,
+                review=review,
+                reason=request.data.get("reason", "default"),
             )
             return Response({"detail": "게시글이 신고되었습니다."}, status=status.HTTP_200_OK)
         return Response(
