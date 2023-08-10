@@ -1,5 +1,6 @@
 from json import JSONDecodeError
 import json
+import os
 from django.http import JsonResponse
 import requests
 from rest_framework import viewsets, mixins, generics
@@ -19,27 +20,23 @@ from allauth.socialaccount.models import SocialAccount
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-state = "awefwefew"
-BASE_URL = "http://127.0.0.1:8000/"
+state = os.getenv("STATE")
+BASE_URL = os.getenv("BASE_URL")
 GOOGLE_CALLBACK_URI = BASE_URL + "api/accounts/google/login/callback/"
 KAKAO_CALLBACK_URI = BASE_URL + "api/accounts/kakao/login/callback/"
 
 
 def google_login(request):
     scope = "https://www.googleapis.com/auth/userinfo.email"
-    client_id = (
-        "709196576668-sv64ue7f2rqaq3j3j298cvo2is328l92.apps.googleusercontent.com"
-    )
+    client_id = os.getenv("GOOGLE_CLIENT_ID")
     return redirect(
         f"https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}"
     )
 
 
 def google_callback(request):
-    client_id = (
-        "709196576668-sv64ue7f2rqaq3j3j298cvo2is328l92.apps.googleusercontent.com"
-    )
-    client_secret = "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"
+    client_id = os.getenv("GOOGLE_CLIENT_ID")
+    client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
     code = request.GET.get("code")
 
     # 1. 받은 코드로 구글에 access token 요청
@@ -125,14 +122,14 @@ class GoogleLogin(SocialLoginView):
 
 
 def kakao_login(request):
-    rest_api_key = "6556fdbf5f3e592092dbd5678bb76f64"
+    rest_api_key = os.getenv("KAKAO_REST_API_KEY")
     return redirect(
         f"https://kauth.kakao.com/oauth/authorize?client_id={rest_api_key}&redirect_uri={KAKAO_CALLBACK_URI}&response_type=code"
     )
 
 
 def kakao_callback(request):
-    rest_api_key = "6556fdbf5f3e592092dbd5678bb76f64"
+    rest_api_key = os.getenv("KAKAO_REST_API_KEY")
     code = request.GET.get("code")
     redirect_uri = KAKAO_CALLBACK_URI
     """
