@@ -153,6 +153,7 @@ class CompletedSerializer(serializers.ModelSerializer):
             "updated_at",
             "writer",
             "likes_cnt",
+            "is_private",
         ]
 
     def get_likes_cnt(self, instance):
