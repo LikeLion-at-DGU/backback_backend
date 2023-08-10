@@ -172,3 +172,13 @@ class CommentSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = ["post"]
+
+
+class BannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Banner
+        fields = [
+            "id",
+            "image",
+            "priority",
+        ]

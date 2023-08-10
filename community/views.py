@@ -9,6 +9,7 @@ from .models import (
     CompletedReport,
     Comment,
     CommentReport,
+    Banner,
 )
 from .serializers import (
     PostListSerializer,
@@ -17,6 +18,7 @@ from .serializers import (
     CompletedListCreateSerializer,
     CompletedSerializer,
     CommentSerializer,
+    BannerSerializer,
 )
 from .filters import PostTypeFilter, FollowingUserPostFilter
 from .permissions import IsOwnerOrReadOnly
@@ -143,8 +145,8 @@ class CompletedViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser]
 
     def get_queryset(self):
-        if self.action == 'list':
-            queryset = Completed.objects.filter(is_private = False)
+        if self.action == "list":
+            queryset = Completed.objects.filter(is_private=False)
             return queryset
         return Completed.objects.all()
 
@@ -193,11 +195,11 @@ class CompletedViewSet(viewsets.ModelViewSet):
         else:
             Reaction.objects.create(completed=completed, user=request.user)
         return Response()
-    
-    @action(methods = ['PATCH'], detail = True)
-    def private(self, request, pk = None):
+
+    @action(methods=["PATCH"], detail=True)
+    def private(self, request, pk=None):
         completed = self.get_object()
-        completed.is_private= True if completed.is_private == False else False
+        completed.is_private = True if completed.is_private == False else False
         completed.save()
         return Response()
 
@@ -245,3 +247,8 @@ class CommentViewSet(mixins.DestroyModelMixin, viewsets.GenericViewSet):
             reason=request.data.get("reason", "default"),
         )
         return Response({"detail": "댓글이 신고되었습니다."}, status=status.HTTP_201_CREATED)
+
+
+class BannerViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    queryset = Banner.objects.all().order_by("priority")
+    serializer_class = BannerSerializer

@@ -91,3 +91,14 @@ class CommentReport(ReportBaseModel):
     comment = models.ForeignKey(
         Comment, related_name="reports", on_delete=models.CASCADE
     )
+
+
+def banner_image_upload_path(instance, filename):
+    return f"{instance.id}/{filename}"
+
+
+class Banner(BaseModel):
+    image = models.ImageField(
+        upload_to=banner_image_upload_path, null=False, blank=False
+    )
+    priority = models.PositiveSmallIntegerField(blank=False)
