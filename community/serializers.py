@@ -57,8 +57,6 @@ class PostListSerializer(serializers.ModelSerializer):
 
 class PostDetailSerializer(serializers.ModelSerializer):
     writer = WriterSerializer(read_only=True)
-    purposes = PurposeSerializer(many=True)
-    exercises = ExerciseSerializer(many=True)
     likes_cnt = serializers.IntegerField(read_only=True)
     images = serializers.SerializerMethodField(read_only=True)
     is_clipped = serializers.SerializerMethodField(read_only=True)
@@ -72,8 +70,8 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "writer",
-            "purposes",
-            "exercises",
+            "purpose",
+            "exercise",
             "title",
             "images",
             "content",

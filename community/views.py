@@ -2,6 +2,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins
 from .models import (
     Post,
+    Purpose,
+    Exercise,
     Scrap,
     PostReport,
     Reaction,
@@ -13,6 +15,8 @@ from .models import (
 from .serializers import (
     PostListSerializer,
     PostDetailSerializer,
+    PurposeSerializer,
+    ExerciseSerializer,
     ScrapSerializer,
     CompletedListCreateSerializer,
     CompletedSerializer,
@@ -138,13 +142,23 @@ class PostViewSet(
         return Response()
 
 
+class PurposeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    queryset = Purpose.objects.all()
+    serializer_class = PurposeSerializer
+
+
+class ExerciseViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    queryset = Exercise.objects.all()
+    serializer_class = ExerciseSerializer
+
+
 class CompletedViewSet(viewsets.ModelViewSet):
     pagination_class = CompletedPagination
     parser_classes = [MultiPartParser]
 
     def get_queryset(self):
-        if self.action == 'list':
-            queryset = Completed.objects.filter(is_private = False)
+        if self.action == "list":
+            queryset = Completed.objects.filter(is_private=False)
             return queryset
         return Completed.objects.all()
 
@@ -193,11 +207,11 @@ class CompletedViewSet(viewsets.ModelViewSet):
         else:
             Reaction.objects.create(completed=completed, user=request.user)
         return Response()
-    
-    @action(methods = ['PATCH'], detail = True)
-    def private(self, request, pk = None):
+
+    @action(methods=["PATCH"], detail=True)
+    def private(self, request, pk=None):
         completed = self.get_object()
-        completed.is_private= True if completed.is_private == False else False
+        completed.is_private = True if completed.is_private == False else False
         completed.save()
         return Response()
 

@@ -21,8 +21,12 @@ class Post(BaseModel):
     title = models.CharField(max_length=50)
     content = models.TextField()
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
-    exercises = models.ManyToManyField(Exercise, related_name="posts", blank=True)
-    purposes = models.ManyToManyField(Purpose, related_name="posts", blank=True)
+    exercise = models.ForeignKey(
+        Exercise, related_name="posts", default="", blank=True, on_delete=models.CASCADE
+    )
+    purpose = models.ForeignKey(
+        Purpose, related_name="posts", default="", blank=True, on_delete=models.CASCADE
+    )
     view_cnt = models.IntegerField(default=0)
 
 
