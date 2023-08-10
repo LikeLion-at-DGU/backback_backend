@@ -1,3 +1,4 @@
+import string
 from json import JSONDecodeError
 import json
 import os
@@ -12,10 +13,10 @@ from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.models import SocialAccount
 from django.shortcuts import redirect
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 
-state = os.getenv("STATE")
 BASE_URL = os.getenv("BASE_URL")
 GOOGLE_CALLBACK_URI = BASE_URL + "api/accounts/google/login/callback/"
 KAKAO_CALLBACK_URI = BASE_URL + "api/accounts/kakao/login/callback/"
@@ -33,6 +34,7 @@ def google_callback(request):
     client_id = os.getenv("GOOGLE_CLIENT_ID")
     client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
     code = request.GET.get("code")
+    state = get_random_string(32, allowed_chars=string.ascii_letters + string.digits)
 
     # 1. 받은 코드로 구글에 access token 요청
     token_req = requests.post(
