@@ -139,9 +139,14 @@ class PostViewSet(
 
 
 class CompletedViewSet(viewsets.ModelViewSet):
-    queryset = Completed.objects.all()
     pagination_class = CompletedPagination
     parser_classes = [MultiPartParser]
+
+    def get_queryset(self):
+        if self.action == 'list':
+            queryset = Completed.objects.filter(is_private = False)
+            return queryset
+        return Completed.objects.all()
 
     def get_serializer_class(self):
         if self.action in ["list", "create"]:
@@ -188,6 +193,13 @@ class CompletedViewSet(viewsets.ModelViewSet):
         else:
             Reaction.objects.create(completed=completed, user=request.user)
         return Response()
+    
+    @action(methods = ['PATCH'], detail = True)
+    def private(self, request, pk = None):
+        completed = self.get_object()
+        completed.is_private= True if completed.is_private == False else False
+        completed.save()
+        return Response()
 
 
 class PostCommentViewSet(
@@ -221,7 +233,7 @@ class CommentViewSet(mixins.DestroyModelMixin, viewsets.GenericViewSet):
         return []
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
-    def reports(self, request, pk=None):
+    def report(self, request, pk=None):
         comment = self.get_object()
         if CommentReport.objects.filter(writer=request.user, comment=comment).exists():
             return Response(
