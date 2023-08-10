@@ -216,7 +216,6 @@ class KakaoLogin(SocialLoginView):
     callback_url = KAKAO_CALLBACK_URI
 
 
-
 class ProfileViewSet(
     viewsets.GenericViewSet,
     mixins.RetrieveModelMixin,
