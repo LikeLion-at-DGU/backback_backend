@@ -183,11 +183,10 @@ class PostViewSet(
     def hot_pro(self, request):
         now = timezone.now()
         today = now.date()  # 현재 날짜
-        days_since_monday = (today.weekday() - 0) % 7  # 월요일까지의 날짜 차이
+        days_since_monday = (today.weekday()) % 7  # 월요일까지의 날짜 차이
         # 월요일을 기준으로 1주일 전과 오늘 사이의 범위 계산
         week_start = today - datetime.timedelta(days=days_since_monday)
         week_end = week_start + datetime.timedelta(days=7)
-
         hot_pro_posts = (
             self.get_queryset()
             .filter(created_at__range=(week_start, week_end), type="PRO")

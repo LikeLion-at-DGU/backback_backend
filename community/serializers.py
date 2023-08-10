@@ -1,7 +1,8 @@
+from ssl import Purpose
+from tokenize import Comment
 from rest_framework import serializers
 from core.serializers import WriterSerializer
-from .models import *
-from accounts.models import *
+from .models import Banner, Completed, Exercise, Post, PostImage, Scrap
 
 
 class PostImageSerializer(serializers.ModelSerializer):
