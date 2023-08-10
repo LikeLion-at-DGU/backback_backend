@@ -14,3 +14,15 @@ class FollowingUserPostFilter(BaseFilterBackend):
         if request.query_params.get("followers") == "true":
             queryset = queryset.filter(writer__profile__followers=request.user.profile)
         return queryset
+
+
+class PostPurposeFilter(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        queryset = queryset.filter(purpose__name=request.query_params.get("purpose"))
+        return queryset
+
+
+class PostExerciseFilter(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        queryset = queryset.filter(exercise__name=request.query_params.get("exercise"))
+        return queryset

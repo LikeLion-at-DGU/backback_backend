@@ -2,6 +2,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins
 from .models import (
     Post,
+    Purpose,
+    Exercise,
     Scrap,
     PostReport,
     Reaction,
@@ -14,13 +16,20 @@ from .models import (
 from .serializers import (
     PostListSerializer,
     PostDetailSerializer,
+    PurposeSerializer,
+    ExerciseSerializer,
     ScrapSerializer,
     CompletedListCreateSerializer,
     CompletedSerializer,
     CommentSerializer,
     BannerSerializer,
 )
-from .filters import PostTypeFilter, FollowingUserPostFilter
+from .filters import (
+    PostTypeFilter,
+    FollowingUserPostFilter,
+    PostExerciseFilter,
+    PostPurposeFilter,
+)
 from .permissions import IsOwnerOrReadOnly
 from .paginations import PostPagination, CompletedPagination
 from rest_framework.filters import SearchFilter
@@ -41,7 +50,13 @@ class PostViewSet(
     viewsets.GenericViewSet,
 ):
     pagination_class = PostPagination
-    filter_backends = [SearchFilter, PostTypeFilter, FollowingUserPostFilter]
+    filter_backends = [
+        SearchFilter,
+        PostTypeFilter,
+        FollowingUserPostFilter,
+        PostExerciseFilter,
+        PostPurposeFilter,
+    ]
     search_fields = ["title", "content"]
     parser_classes = [MultiPartParser]
 
@@ -138,6 +153,16 @@ class PostViewSet(
         else:
             Reaction.objects.create(post=post, user=request.user)
         return Response()
+
+
+class PurposeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    queryset = Purpose.objects.all()
+    serializer_class = PurposeSerializer
+
+
+class ExerciseViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    queryset = Exercise.objects.all()
+    serializer_class = ExerciseSerializer
 
 
 class CompletedViewSet(viewsets.ModelViewSet):
