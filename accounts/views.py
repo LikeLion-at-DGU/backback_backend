@@ -8,8 +8,8 @@ from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from accounts.models import Profile, ProfileReport
 from accounts.serializers import ProfileSerializer
-from community.models import Post
-from community.serializers import PostListSerializer
+from community.models import Post, Completed
+from community.serializers import PostListSerializer, CompletedListCreateSerializer
 
 
 class ProfileViewSet(
@@ -57,6 +57,12 @@ class ProfileViewSet(
     def posts(self, requset, pk=None):
         posts = Post.objects.filter(writer__id=pk)
         serializer = PostListSerializer(posts, many=True)
+        return Response(serializer.data)
+
+    @action(["GET"], detail=True, url_path="completions")
+    def completions(self, request, pk=None):
+        completions = Completed.objects.filter(writer__id=pk)
+        serializer = CompletedListCreateSerializer(completions, many=True)
         return Response(serializer.data)
 
 
