@@ -59,7 +59,6 @@ class GymViewSet(
             {"detail": "이미 신고한 게시글입니다."}, status=status.HTTP_400_BAD_REQUEST
         )
 
-
     @action(["POST"], detail=False, url_path="use-location")  # 내 주변 헬스장
     def use_location(self, request):
         latitude = float(request.data.get("latitude"))
