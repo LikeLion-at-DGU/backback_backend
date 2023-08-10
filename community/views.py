@@ -26,7 +26,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, JSONParser
 from django.db.models import Q, Count
 
 
@@ -41,6 +41,8 @@ class PostViewSet(
     pagination_class = PostPagination
     filter_backends = [SearchFilter, PostTypeFilter, FollowingUserPostFilter]
     search_fields = ["title", "content"]
+    parser_classes = [MultiPartParser]
+
     queryset = Post.objects.annotate(
         likes_cnt=Count(
             "reactions", filter=Q(reactions__completed__isnull=True), distinct=True
@@ -80,7 +82,7 @@ class PostViewSet(
                 )
             Scrap.objects.create(user=request.user, post=post)
             return Response(
-                {"detail": "미게시물이 스크랩되었습니다."}, status=status.HTTP_201_CREATED
+                {"detail": "게시물이 스크랩되었습니다."}, status=status.HTTP_201_CREATED
             )
 
         elif request.method == "DELETE":
@@ -102,7 +104,12 @@ class PostViewSet(
         serializer = ScrapSerializer(scraps, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=[IsAuthenticated],
+        parser_classes=[JSONParser],
+    )
     def report(self, request, pk=None):
         post = self.get_object()
         if PostReport.objects.filter(writer=request.user, post=post).exists():
@@ -151,7 +158,11 @@ class CompletedViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
 
-    @action(methods=["POST"], detail=True, url_path="report")
+    @action(
+        methods=["POST"],
+        detail=True,
+        parser_classes=[JSONParser],
+    )
     def report(self, request, pk=None):
         completed = self.get_object()
         if CompletedReport.objects.filter(
