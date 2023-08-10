@@ -26,7 +26,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, JSONParser
 from django.db.models import Q, Count
 
 
@@ -41,11 +41,21 @@ class PostViewSet(
     pagination_class = PostPagination
     filter_backends = [SearchFilter, PostTypeFilter, FollowingUserPostFilter]
     search_fields = ["title", "content"]
+
     queryset = Post.objects.annotate(
         likes_cnt=Count(
             "reactions", filter=Q(reactions__completed__isnull=True), distinct=True
         ),
     ).order_by("-pk")
+
+    def initialize_request(self, request, *args, **kwargs):
+        self.action = self.action_map.get(request.method.lower())
+        return super().initialize_request(request, *args, **kwargs)
+
+    def get_parsers(self):
+        if self.action == "report":
+            return [JSONParser]
+        return [JSONParser, MultiPartParser]
 
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
@@ -80,7 +90,7 @@ class PostViewSet(
                 )
             Scrap.objects.create(user=request.user, post=post)
             return Response(
-                {"detail": "미게시물이 스크랩되었습니다."}, status=status.HTTP_201_CREATED
+                {"detail": "게시물이 스크랩되었습니다."}, status=status.HTTP_201_CREATED
             )
 
         elif request.method == "DELETE":
@@ -134,7 +144,15 @@ class PostViewSet(
 class CompletedViewSet(viewsets.ModelViewSet):
     queryset = Completed.objects.all()
     pagination_class = CompletedPagination
-    parser_classes = [MultiPartParser]
+
+    def initialize_request(self, request, *args, **kwargs):
+        self.action = self.action_map.get(request.method.lower())
+        return super().initialize_request(request, *args, **kwargs)
+
+    def get_parsers(self):
+        if self.action == "report":
+            return [JSONParser]
+        return [JSONParser, MultiPartParser]
 
     def get_serializer_class(self):
         if self.action in ["list", "create"]:
