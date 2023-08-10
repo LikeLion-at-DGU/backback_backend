@@ -55,7 +55,7 @@ class PostViewSet(
         PostExerciseFilter,
         PostPurposeFilter,
     ]
-    search_fields = ["title", "content", "=purpose__name", "=exercise__name"]
+    search_fields = ["title", "content"]
     parser_classes = [MultiPartParser]
 
     queryset = Post.objects.annotate(
