@@ -23,6 +23,7 @@ class Post(BaseModel):
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     exercises = models.ManyToManyField(Exercise, related_name="posts", blank=True)
     purposes = models.ManyToManyField(Purpose, related_name="posts", blank=True)
+    view_cnt = models.IntegerField(default=0)
 
 
 class PostReport(ReportBaseModel):
@@ -48,3 +49,45 @@ class Scrap(BaseModel):
 
     class Meta:
         unique_together = ("user", "post")
+
+
+def completions_image_upload_path(instance, filename):
+    return f"completions/{instance.id}/{filename}"
+
+
+class Completed(BaseModel):
+    writer = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
+    title = models.CharField(max_length=50)
+    content = models.CharField(max_length=500)
+    image = models.ImageField(upload_to=completions_image_upload_path)
+    is_private = models.BooleanField(default=False)
+
+
+class CompletedReport(ReportBaseModel):
+    completed = models.ForeignKey(
+        Completed, related_name="reports", on_delete=models.CASCADE
+    )
+
+
+class Reaction(BaseModel):
+    user = models.ForeignKey(User, related_name="reactions", on_delete=models.CASCADE)
+    post = models.ForeignKey(
+        Post, null=True, related_name="reactions", on_delete=models.CASCADE
+    )
+    completed = models.ForeignKey(
+        Completed, null=True, related_name="reactions", on_delete=models.CASCADE
+    )
+
+
+class Comment(BaseModel):
+    writer = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
+    content = models.CharField(max_length=500)
+    post = models.ForeignKey(
+        Post, related_name="comments", null=False, blank=False, on_delete=models.CASCADE
+    )
+
+
+class CommentReport(ReportBaseModel):
+    comment = models.ForeignKey(
+        Comment, related_name="reports", on_delete=models.CASCADE
+    )

@@ -3,6 +3,7 @@ import json
 import os
 from django.http import JsonResponse
 import requests
+from django.contrib.auth.models import User
 from rest_framework import viewsets, mixins, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action, permission_classes
@@ -10,8 +11,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.shortcuts import redirect, get_object_or_404
 from django.core.exceptions import PermissionDenied
-from .models import Profile
-from .serializers import *
+from .models import Profile, ProfileReport
+from accounts.serializers import ProfileSerializer
+from community.models import Post, Completed
+from community.serializers import PostListSerializer, CompletedListCreateSerializer
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.google import views as google_view
@@ -213,10 +216,9 @@ class KakaoLogin(SocialLoginView):
     callback_url = KAKAO_CALLBACK_URI
 
 
+
 class ProfileViewSet(
     viewsets.GenericViewSet,
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
 ):
@@ -228,10 +230,9 @@ class ProfileViewSet(
     def follow(self, request, pk=None):
         user = request.user
         followed_user = self.get_object()
-
         if user.profile == followed_user:
             return Response(
-                {"detail": "You cannot follow yourself."},
+                {"detail": "본인은 팔로우 할 수 없습니다."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -245,18 +246,29 @@ class ProfileViewSet(
     @permission_classes([IsAuthenticated])
     def report(self, request, pk=None):
         profile = self.get_object()
-        reason = request.data.get("reason")
-
         if profile == request.user.profile:
             return Response(
-                {"detail": "You cannot follow yourself."},
+                {"detail": "본인은 신고할 수 없습니다."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
         ProfileReport.objects.create(
-            writer=request.user, reason=reason, profile=profile
+            writer=request.user,
+            reason=request.data.get("reason", "default"),
+            profile=profile,
         )
-        return Response()
+        return Response({"detail": "이미 스크랩한 게시물입니다."})
+
+    @action(["GET"], detail=True, url_path="posts")
+    def posts(self, requset, pk=None):
+        posts = Post.objects.filter(writer__id=pk)
+        serializer = PostListSerializer(posts, many=True)
+        return Response(serializer.data)
+
+    @action(["GET"], detail=True, url_path="completions")
+    def completions(self, request, pk=None):
+        completions = Completed.objects.filter(writer__id=pk)
+        serializer = CompletedListCreateSerializer(completions, many=True)
+        return Response(serializer.data)
 
 
 class MeViewSet(generics.RetrieveUpdateAPIView):

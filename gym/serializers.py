@@ -58,6 +58,7 @@ class ReviewListSerializer(serializers.ModelSerializer):
 
 class GymListSerializer(serializers.ModelSerializer):
     exercises = serializers.CharField(source="info.exercises", read_only=True)
+    image = serializers.ImageField(use_url=True)
 
     class Meta:
         model = Gym
@@ -68,6 +69,7 @@ class GymListSerializer(serializers.ModelSerializer):
             "exercises",
             "created_at",
             "updated_at",
+            "image",
         ]
         read_only_field = [
             "id",
