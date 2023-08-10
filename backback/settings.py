@@ -25,10 +25,10 @@ if os.path.exists(f"{BASE_DIR}/.env"):
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-n(sb8qp375l1c^4%ossh0rsm954cw-2s_#%^-=9w*n1qq-vh+@"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True if os.getenv("DEBUG") == "True" else False
 
 ALLOWED_HOSTS = ["*"]
 
