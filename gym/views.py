@@ -50,7 +50,7 @@ class GymViewSet(
         gym = self.get_object()
         gymreport = gym.reports.filter(writer=request.user)
         if not gymreport.exists():
-            reason = request.data.get("reason")
+            reason = request.data.get("reason", default="그냥 신고합니다.")
             GymReport.objects.create(writer=request.user, gym=gym, reason=reason)
             return Response({"detail": "게시글이 신고되었습니다."}, status=status.HTTP_200_OK)
         return Response(
@@ -91,7 +91,7 @@ class ReviewViewSet(
         review = self.get_object()
         reviewreport = review.reports.filter(writer=request.user)
         if not reviewreport.exists():
-            reason = request.data.get("reason")
+            reason = request.data.get("reason", default="그냥 신고합니다.")
             ReviewReport.objects.create(
                 writer=request.user, review=review, reason=reason
             )
