@@ -11,6 +11,7 @@ from .models import (
     CompletedReport,
     Comment,
     CommentReport,
+    Banner,
 )
 from .serializers import (
     PostListSerializer,
@@ -21,6 +22,7 @@ from .serializers import (
     CompletedListCreateSerializer,
     CompletedSerializer,
     CommentSerializer,
+    BannerSerializer,
 )
 from .filters import (
     PostTypeFilter,
@@ -270,3 +272,8 @@ class CommentViewSet(mixins.DestroyModelMixin, viewsets.GenericViewSet):
             reason=request.data.get("reason", "default"),
         )
         return Response({"detail": "댓글이 신고되었습니다."}, status=status.HTTP_201_CREATED)
+
+
+class BannerViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    queryset = Banner.objects.all().order_by("priority")
+    serializer_class = BannerSerializer

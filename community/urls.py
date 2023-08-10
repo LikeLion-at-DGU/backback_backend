@@ -21,6 +21,9 @@ purpose_router.register("purposes", PurposeViewSet, basename="purposes")
 exercise_router = routers.SimpleRouter(trailing_slash=False)
 exercise_router.register("exercises", ExerciseViewSet, basename="exercises")
 
+banner_router = routers.SimpleRouter(trailing_slash=False)
+banner_router.register("banners", BannerViewSet, basename="banners")
+
 urlpatterns = [
     path("", include(post_router.urls)),
     path("", include(comment_router.urls)),
@@ -28,4 +31,5 @@ urlpatterns = [
     path("", include(purpose_router.urls)),
     path("", include(exercise_router.urls)),
     path("posts/<int:post_id>/", include(post_comment_router.urls)),
+    path("", include(banner_router.urls)),
 ]
