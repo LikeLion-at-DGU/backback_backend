@@ -6,9 +6,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
-
 from accounts.models import Profile, ProfileReport
 from accounts.serializers import ProfileSerializer
+from community.models import Post
+from community.serializers import PostListSerializer
 
 
 class ProfileViewSet(
@@ -51,6 +52,12 @@ class ProfileViewSet(
             profile=profile,
         )
         return Response({"detail": "이미 스크랩한 게시물입니다."})
+
+    @action(["GET"], detail=True, url_path="posts")
+    def posts(self, requset, pk=None):
+        posts = Post.objects.filter(writer__id=pk)
+        serializer = PostListSerializer(posts, many=True)
+        return Response(serializer.data)
 
 
 class MeViewSet(generics.RetrieveUpdateAPIView):
