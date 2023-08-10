@@ -23,4 +23,6 @@ urlpatterns = [
     path("api/", include("accounts.urls")),
     path("api/", include("community.urls")),
     path("api/", include("gym.urls")),
+    path("api/accounts/", include("allauth.urls")),
+    path("accounts/", include("dj_rest_auth.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
