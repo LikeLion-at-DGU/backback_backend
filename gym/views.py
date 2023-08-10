@@ -48,15 +48,17 @@ class GymViewSet(
     )  # 신고
     def report(self, request, pk):
         gym = self.get_object()
-        gymreport = gym.reports.filter(writer=request.user)
-        if not gymreport.exists():
+        if not gym.reports.filter(writer=request.user).exists():
             GymReport.objects.create(
                 writer=request.user,
                 gym=gym,
                 reason=request.data.get("reason", "default"),
             )
-            return Response(status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "게시글이 신고되었습니다."}, status=status.HTTP_200_OK)
+        return Response(
+            {"detail": "이미 신고한 게시글입니다."}, status=status.HTTP_400_BAD_REQUEST
+        )
+
 
     @action(["POST"], detail=False, url_path="use-location")  # 내 주변 헬스장
     def use_location(self, request):
@@ -96,8 +98,10 @@ class ReviewViewSet(
                 review=review,
                 reason=request.data.get("reason", "default"),
             )
-            return Response(status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "게시글이 신고되었습니다."}, status=status.HTTP_200_OK)
+        return Response(
+            {"detail": "이미 신고한 게시글입니다."}, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class GymReviewViewSet(
@@ -129,4 +133,6 @@ class GymReviewViewSet(
             serializer.is_valid(raise_exception=True)
             serializer.save(writer=request.user, gym=gym)
             return Response(serializer.data)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"detail": "올바른 key를 입력해주세요."}, status=status.HTTP_400_BAD_REQUEST
+        )
