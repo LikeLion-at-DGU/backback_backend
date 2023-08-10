@@ -1,9 +1,24 @@
-from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins
-from .models import *
-from .serializers import *
-from .filters import *
+from .models import (
+    Post,
+    Scrap,
+    PostReport,
+    Reaction,
+    Completed,
+    CompletedReport,
+    Comment,
+    CommentReport,
+)
+from .serializers import (
+    PostListSerializer,
+    PostDetailSerializer,
+    ScrapSerializer,
+    CompletedListCreateSerializer,
+    CompletedSerializer,
+    CommentSerializer,
+)
+from .filters import PostTypeFilter, FollowingUserPostFilter
 from .permissions import IsOwnerOrReadOnly
 from .paginations import PostPagination, CompletedPagination
 from rest_framework.filters import SearchFilter
@@ -63,10 +78,9 @@ class PostViewSet(
                 return Response(
                     {"detail": "이미 스크랩한 게시물입니다."}, status=status.HTTP_400_BAD_REQUEST
                 )
-            scrap = Scrap(user=request.user, post=post)
-            scrap.save()
+            Scrap.objects.create(user=request.user, post=post)
             return Response(
-                {"detail": "게시물이 스크랩되었습니다."}, status=status.HTTP_201_CREATED
+                {"detail": "미게시물이 스크랩되었습니다."}, status=status.HTTP_201_CREATED
             )
 
         elif request.method == "DELETE":
@@ -95,8 +109,9 @@ class PostViewSet(
             return Response(
                 {"detail": "이미 신고한 게시글입니다."}, status=status.HTTP_400_BAD_REQUEST
             )
-        report = PostReport(writer=request.user, post=post)
-        report.save()
+        PostReport.objects.create(
+            writer=request.user, post=post, reason=request.data.get("reason", "default")
+        )
         return Response({"detail": "게시글이 신고되었습니다."}, status=status.HTTP_201_CREATED)
 
     @action(
@@ -146,7 +161,9 @@ class CompletedViewSet(viewsets.ModelViewSet):
                 {"detail": "이미 신고한 게시글입니다."}, status=status.HTTP_400_BAD_REQUEST
             )
         CompletedReport.objects.create(
-            completed=completed, writer=request.user, reason=request.POST["reason"]
+            completed=completed,
+            writer=request.user,
+            reason=request.data.get("reason", "default"),
         )
         return Response()
 
@@ -177,7 +194,7 @@ class PostCommentViewSet(
         post = get_object_or_404(Post, id=post_id)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(post=post)
+        serializer.save(post=post, writer=request.user)
         return Response(serializer.data)
 
 
@@ -199,6 +216,9 @@ class CommentViewSet(mixins.DestroyModelMixin, viewsets.GenericViewSet):
             return Response(
                 {"detail": "이미 신고한 댓글입니다."}, status=status.HTTP_400_BAD_REQUEST
             )
-        report = CommentReport(writer=request.user, comment=comment)
-        report.save()
+        CommentReport.objects.create(
+            writer=request.user,
+            comment=comment,
+            reason=request.data.get("reason", "default"),
+        )
         return Response({"detail": "댓글이 신고되었습니다."}, status=status.HTTP_201_CREATED)

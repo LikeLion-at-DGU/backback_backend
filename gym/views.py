@@ -50,8 +50,11 @@ class GymViewSet(
         gym = self.get_object()
         gymreport = gym.reports.filter(writer=request.user)
         if not gymreport.exists():
-            reason = request.data.get("reason")
-            GymReport.objects.create(writer=request.user, gym=gym, reason=reason)
+            GymReport.objects.create(
+                writer=request.user,
+                gym=gym,
+                reason=request.data.get("reason", "default"),
+            )
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -87,11 +90,11 @@ class ReviewViewSet(
     )  # 신고
     def report(self, request, pk):
         review = self.get_object()
-        reviewreport = review.reports.filter(writer=request.user)
-        if not reviewreport.exists():
-            reason = request.data.get("reason")
+        if not review.reports.filter(writer=request.user).exists():
             ReviewReport.objects.create(
-                writer=request.user, review=review, reason=reason
+                writer=request.user,
+                review=review,
+                reason=request.data.get("reason", "default"),
             )
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -1,18 +1,18 @@
+from django.contrib.auth.models import User
 from rest_framework import viewsets, mixins, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
-from .models import Profile
-from .serializers import *
+
+from accounts.models import Profile, ProfileReport
+from accounts.serializers import ProfileSerializer
 
 
 class ProfileViewSet(
     viewsets.GenericViewSet,
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
 ):
@@ -24,10 +24,9 @@ class ProfileViewSet(
     def follow(self, request, pk=None):
         user = request.user
         followed_user = self.get_object()
-
         if user.profile == followed_user:
             return Response(
-                {"detail": "You cannot follow yourself."},
+                {"detail": "본인은 팔로우 할 수 없습니다."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -41,18 +40,17 @@ class ProfileViewSet(
     @permission_classes([IsAuthenticated])
     def report(self, request, pk=None):
         profile = self.get_object()
-        reason = request.data.get("reason")
-
         if profile == request.user.profile:
             return Response(
-                {"detail": "You cannot follow yourself."},
+                {"detail": "본인은 신고할 수 없습니다."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
         ProfileReport.objects.create(
-            writer=request.user, reason=reason, profile=profile
+            writer=request.user,
+            reason=request.data.get("reason", "default"),
+            profile=profile,
         )
-        return Response()
+        return Response({"detail": "이미 스크랩한 게시물입니다."})
 
 
 class MeViewSet(generics.RetrieveUpdateAPIView):
