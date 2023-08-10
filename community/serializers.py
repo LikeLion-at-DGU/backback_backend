@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from core.serializers import WriterSerializer
 from .models import *
+from accounts.models import *
 
 
 class PostImageSerializer(serializers.ModelSerializer):
@@ -80,21 +81,28 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "is_liked",
             "is_clipped",
             "view_cnt",
+            "type",
         ]
         read_only_fields = [
             "view_cnt",
         ]
 
     def get_is_liked(self, instance):
-        return instance.reactions.filter(
-            completed__isnull=True, user=self.context["request"].user
-        ).exists()
+        if (user := self.context["request"].user).is_authenticated:
+            return instance.reactions.filter(completed__isnull=True, user=user).exists()
+        return False
 
     def get_images(self, obj):
         image = obj.images.all()
         return PostImageSerializer(instance=image, many=True, context=self.context).data
 
     def create(self, validated_data):
+        user = self.context["request"].user
+        profile = user.profile
+
+        if profile.type == "COMMON" and validated_data.get("type") != "ORDINARY":
+            raise serializers.ValidationError("해당 게시판에 작성 권한이 없습니다.")
+
         instance = Post.objects.create(**validated_data)
         image_set = self.context["request"].FILES
         for image_data in image_set.getlist("image"):
@@ -102,8 +110,9 @@ class PostDetailSerializer(serializers.ModelSerializer):
         return instance
 
     def get_is_clipped(self, obj):
-        user = self.context["request"].user
-        return Scrap.objects.filter(user=user, post=obj).exists()
+        if (user := self.context["request"].user).is_authenticated:
+            return Scrap.objects.filter(user=user, post=obj).exists()
+        return False
 
     def get_comments_cnt(self, instance):
         return instance.comments.count()
@@ -141,6 +150,7 @@ class CompletedSerializer(serializers.ModelSerializer):
     writer = WriterSerializer(read_only=True)
     image = serializers.ImageField(use_url=True, read_only=True)
     likes_cnt = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Completed
@@ -156,6 +166,11 @@ class CompletedSerializer(serializers.ModelSerializer):
 
     def get_likes_cnt(self, instance):
         return instance.reactions.count()
+
+    def get_is_liked(self, instance):
+        if (user := self.context["request"].user).is_authenticated:
+            return instance.reactions.filter(completed__isnull=True, user=user).exists()
+        return False
 
 
 class CommentSerializer(serializers.ModelSerializer):

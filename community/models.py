@@ -20,13 +20,13 @@ class Post(BaseModel):
     writer = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     content = models.TextField()
-    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     exercise = models.ForeignKey(
         Exercise, related_name="posts", default="", blank=True, on_delete=models.CASCADE
     )
     purpose = models.ForeignKey(
         Purpose, related_name="posts", default="", blank=True, on_delete=models.CASCADE
     )
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default="ORDINARY")
     view_cnt = models.IntegerField(default=0)
 
 

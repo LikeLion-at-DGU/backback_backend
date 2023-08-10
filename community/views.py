@@ -1,4 +1,6 @@
+import datetime
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import viewsets, mixins
 from .models import (
     Post,
@@ -118,8 +120,18 @@ class PostViewSet(
     def clips(self, request):
         user = request.user
         scraps = Scrap.objects.filter(user=user)
-        serializer = ScrapSerializer(scraps, many=True)
-        return Response(serializer.data)
+        paginator = PostPagination()
+        page = paginator.paginate_queryset(scraps, request)
+        serializer = (
+            ScrapSerializer(page, many=True)
+            if page is not None
+            else ScrapSerializer(scraps, many=True)
+        )
+        return (
+            paginator.get_paginated_response(serializer.data)
+            if page is not None
+            else Response(serializer.data)
+        )
 
     @action(
         detail=True,
@@ -153,6 +165,38 @@ class PostViewSet(
         else:
             Reaction.objects.create(post=post, user=request.user)
         return Response()
+
+    @action(methods=["GET"], detail=False, url_path="hot-ord")
+    def hot_ordinary(self, request):
+        yesterday = datetime.date.today() - datetime.timedelta(days=1)
+        hot_ord_posts = (
+            self.get_queryset()
+            .filter(created_at__gte=yesterday, type="ORDINARY")
+            .order_by("-likes_cnt")[:2]
+        )
+        hot_ord_posts_serializer = PostListSerializer(
+            hot_ord_posts, many=True, context={"request": request}
+        )
+        return Response(hot_ord_posts_serializer.data)
+
+    @action(methods=["GET"], detail=False, url_path="hot-pro")
+    def hot_pro(self, request):
+        now = timezone.now()
+        today = now.date()  # 현재 날짜
+        days_since_monday = (today.weekday() - 0) % 7  # 월요일까지의 날짜 차이
+        # 월요일을 기준으로 1주일 전과 오늘 사이의 범위 계산
+        week_start = today - datetime.timedelta(days=days_since_monday)
+        week_end = week_start + datetime.timedelta(days=7)
+
+        hot_pro_posts = (
+            self.get_queryset()
+            .filter(created_at__range=(week_start, week_end), type="PRO")
+            .order_by("-view_cnt")[:5]
+        )
+        hot_pro_posts_serializer = PostListSerializer(
+            hot_pro_posts, many=True, context={"request": request}
+        )
+        return Response(hot_pro_posts_serializer.data)
 
 
 class PurposeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
