@@ -141,7 +141,7 @@ class PostViewSet(
 class CompletedViewSet(viewsets.ModelViewSet):
     queryset = Completed.objects.all()
     pagination_class = CompletedPagination
-    parser_classes = MultiPartParser
+    parser_classes = [MultiPartParser]
 
     def get_serializer_class(self):
         if self.action in ["list", "create"]:
