@@ -22,7 +22,12 @@ from .serializers import (
     CompletedSerializer,
     CommentSerializer,
 )
-from .filters import PostTypeFilter, FollowingUserPostFilter
+from .filters import (
+    PostTypeFilter,
+    FollowingUserPostFilter,
+    PostExerciseFilter,
+    PostPurposeFilter,
+)
 from .permissions import IsOwnerOrReadOnly
 from .paginations import PostPagination, CompletedPagination
 from rest_framework.filters import SearchFilter
@@ -43,8 +48,14 @@ class PostViewSet(
     viewsets.GenericViewSet,
 ):
     pagination_class = PostPagination
-    filter_backends = [SearchFilter, PostTypeFilter, FollowingUserPostFilter]
-    search_fields = ["title", "content"]
+    filter_backends = [
+        SearchFilter,
+        PostTypeFilter,
+        FollowingUserPostFilter,
+        PostExerciseFilter,
+        PostPurposeFilter,
+    ]
+    search_fields = ["title", "content", "=purpose__name", "=exercise__name"]
     parser_classes = [MultiPartParser]
 
     queryset = Post.objects.annotate(
