@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.core.exceptions import PermissionDenied
 from .models import Profile
 from .serializers import *
@@ -16,6 +16,7 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.google import views as google_view
 from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.models import SocialAccount
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 state = "awefwefew"
@@ -56,8 +57,6 @@ def google_callback(request):
     ### 1-3. 성공 시 access_token 가져오기
     access_token = token_req_json.get("access_token")
 
-    #################################################################
-
     # 2. 가져온 access_token으로 이메일값을 구글에 요청
     email_req = requests.get(
         f"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={access_token}"
@@ -73,10 +72,6 @@ def google_callback(request):
     ### 2-2. 성공 시 이메일 가져오기
     email_req_json = email_req.json()
     email = email_req_json.get("email")
-
-    # return JsonResponse({'access': access_token, 'email':email})
-
-    #################################################################
 
     # 3. 전달받은 이메일, access_token, code를 바탕으로 회원가입/로그인
     try:
@@ -94,12 +89,8 @@ def google_callback(request):
             f"{BASE_URL}api/accounts/google/login/finish/", data=data
         )
         accept_status = accept.status_code
-
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signin"}, status=accept_status)
-
-        accept_json = accept.json()
-        return JsonResponse(accept_json)
 
     except User.DoesNotExist:
         data = {"access_token": access_token, "code": code}
@@ -107,16 +98,24 @@ def google_callback(request):
             f"{BASE_URL}api/accounts/google/login/finish/", data=data
         )
         accept_status = accept.status_code
-
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signup"}, status=accept_status)
-        accept_json = accept.json()
-        return JsonResponse(accept_json)
     except SocialAccount.DoesNotExist:
         return JsonResponse(
             {"err_msg": "email exists but not social user"},
             status=status.HTTP_400_BAD_REQUEST,
         )
+    user = User.objects.get(email=email)
+    refresh = RefreshToken.for_user(user)
+    access_token = str(refresh.access_token)
+
+    response_data = {
+        "message": "Login Success",
+        "access_token": access_token,
+        "refresh_token": str(refresh),
+        "user": ProfileSerializer(user.profile).data,
+    }
+    return JsonResponse(response_data)
 
 
 class GoogleLogin(SocialLoginView):
@@ -188,16 +187,27 @@ def kakao_callback(request):
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signin"}, status=accept_status)
-        accept_json = accept.json()
-        return JsonResponse(accept_json)
     except User.DoesNotExist:
         data = {"access_token": access_token, "code": code}
         accept = requests.post(f"{BASE_URL}api/accounts/kakao/login/finish/", data=data)
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signup"}, status=accept_status)
-        accept_json = accept.json()
-        return JsonResponse(accept_json)
+    except SocialAccount.DoesNotExist:
+        return JsonResponse(
+            {"err_msg": "user exists but not social user"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    user = User.objects.get(username=username)
+    refresh = RefreshToken.for_user(user)
+    access_token = str(refresh.access_token)
+    response_data = {
+        "message": "Login Susccess",
+        "access_token": access_token,
+        "refresh_token": str(refresh),
+        "user": ProfileSerializer(user.profile).data,
+    }
+    return JsonResponse(response_data)
 
 
 class KakaoLogin(SocialLoginView):
