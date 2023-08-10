@@ -81,7 +81,6 @@ def google_callback(request):
     # 3. 전달받은 이메일, access_token, code를 바탕으로 회원가입/로그인
     try:
         user = User.objects.get(email=email)
-
         social_user = SocialAccount.objects.get(user=user)
 
         if social_user.provider != "google":
@@ -100,7 +99,6 @@ def google_callback(request):
             return JsonResponse({"err_msg": "failed to signin"}, status=accept_status)
 
         accept_json = accept.json()
-        accept_json.pop("user", None)
         return JsonResponse(accept_json)
 
     except User.DoesNotExist:
@@ -113,7 +111,6 @@ def google_callback(request):
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signup"}, status=accept_status)
         accept_json = accept.json()
-        accept_json.pop("user", None)
         return JsonResponse(accept_json)
     except SocialAccount.DoesNotExist:
         return JsonResponse(
@@ -167,12 +164,14 @@ def kakao_callback(request):
     카카오톡 프로필 이미지, 배경 이미지 url 가져올 수 있음
     print(kakao_account) 참고
     """
-    username = kakao_account.get("nickname")
+    username = kakao_account.get("profile").get("nickname")
     """
     Signup or Signin Request
     """
     try:
-        user = User.objects.get(username=username)
+        user = User.objects.get(
+            username=username
+        )  # username만 필수로 동의받을 수 있는데 username이 겹치는 경우 어떠한 처리를 해야할까?
         social_user = SocialAccount.objects.get(user=user)
         if social_user is None:
             return JsonResponse(
@@ -190,7 +189,6 @@ def kakao_callback(request):
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signin"}, status=accept_status)
         accept_json = accept.json()
-        accept_json.pop("user", None)
         return JsonResponse(accept_json)
     except User.DoesNotExist:
         data = {"access_token": access_token, "code": code}
@@ -199,7 +197,6 @@ def kakao_callback(request):
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signup"}, status=accept_status)
         accept_json = accept.json()
-        accept_json.pop("user", None)
         return JsonResponse(accept_json)
 
 
