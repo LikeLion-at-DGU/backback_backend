@@ -41,21 +41,13 @@ class PostViewSet(
     pagination_class = PostPagination
     filter_backends = [SearchFilter, PostTypeFilter, FollowingUserPostFilter]
     search_fields = ["title", "content"]
+    parser_classes = [MultiPartParser]
 
     queryset = Post.objects.annotate(
         likes_cnt=Count(
             "reactions", filter=Q(reactions__completed__isnull=True), distinct=True
         ),
     ).order_by("-pk")
-
-    def initialize_request(self, request, *args, **kwargs):
-        self.action = self.action_map.get(request.method.lower())
-        return super().initialize_request(request, *args, **kwargs)
-
-    def get_parsers(self):
-        if self.action == "report":
-            return [JSONParser]
-        return [JSONParser, MultiPartParser]
 
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
@@ -112,7 +104,12 @@ class PostViewSet(
         serializer = ScrapSerializer(scraps, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=[IsAuthenticated],
+        parser_classes=[JSONParser],
+    )
     def report(self, request, pk=None):
         post = self.get_object()
         if PostReport.objects.filter(writer=request.user, post=post).exists():
@@ -144,15 +141,7 @@ class PostViewSet(
 class CompletedViewSet(viewsets.ModelViewSet):
     queryset = Completed.objects.all()
     pagination_class = CompletedPagination
-
-    def initialize_request(self, request, *args, **kwargs):
-        self.action = self.action_map.get(request.method.lower())
-        return super().initialize_request(request, *args, **kwargs)
-
-    def get_parsers(self):
-        if self.action == "report":
-            return [JSONParser]
-        return [JSONParser, MultiPartParser]
+    parser_classes = MultiPartParser
 
     def get_serializer_class(self):
         if self.action in ["list", "create"]:
@@ -169,7 +158,11 @@ class CompletedViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
 
-    @action(methods=["POST"], detail=True, url_path="report")
+    @action(
+        methods=["POST"],
+        detail=True,
+        parser_classes=[JSONParser],
+    )
     def report(self, request, pk=None):
         completed = self.get_object()
         if CompletedReport.objects.filter(
