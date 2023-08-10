@@ -12,6 +12,5 @@ class PostTypeFilter(BaseFilterBackend):
 class FollowingUserPostFilter(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         if request.query_params.get("followers") == "true":
-            following_users = request.user.profile.followings.all()
-            queryset = queryset.filter(writer__profile__user__in=following_users)
+            queryset = queryset.filter(writer__profile__followers=request.user.profile)
         return queryset
