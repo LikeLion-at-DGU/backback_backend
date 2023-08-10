@@ -60,10 +60,10 @@ class PostDetailSerializer(serializers.ModelSerializer):
     purposes = PurposeSerializer(many=True)
     exercises = ExerciseSerializer(many=True)
     likes_cnt = serializers.IntegerField(read_only=True)
-    images = serializers.SerializerMethodField()
-    is_clipped = serializers.SerializerMethodField()
-    comments_cnt = serializers.SerializerMethodField()
-    is_liked = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField(read_only=True)
+    is_clipped = serializers.SerializerMethodField(read_only=True)
+    comments_cnt = serializers.SerializerMethodField(read_only=True)
+    is_liked = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Post
