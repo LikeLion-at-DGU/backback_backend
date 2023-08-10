@@ -21,7 +21,7 @@ from allauth.socialaccount.providers.google import views as google_view
 from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.models import SocialAccount
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from .paginations import AccountsPagination
 
 state = os.getenv("STATE")
 BASE_URL = os.getenv("BASE_URL")
@@ -258,16 +258,36 @@ class ProfileViewSet(
         return Response({"detail": "이미 스크랩한 게시물입니다."})
 
     @action(["GET"], detail=True, url_path="posts")
-    def posts(self, requset, pk=None):
+    def posts(self, request, pk=None):
         posts = Post.objects.filter(writer__id=pk)
-        serializer = PostListSerializer(posts, many=True)
-        return Response(serializer.data)
+        paginator = AccountsPagination()
+        page = paginator.paginate_queryset(posts, request)
+        serializer = (
+            PostListSerializer(page, many=True)
+            if page is not None
+            else PostListSerializer(posts, many=True)
+        )
+        return (
+            paginator.get_paginated_response(serializer.data)
+            if page is not None
+            else Response(serializer.data)
+        )
 
     @action(["GET"], detail=True, url_path="completions")
     def completions(self, request, pk=None):
         completions = Completed.objects.filter(writer__id=pk)
-        serializer = CompletedListCreateSerializer(completions, many=True)
-        return Response(serializer.data)
+        paginator = AccountsPagination()
+        page = paginator.paginate_queryset(completions, request)
+        serializer = (
+            CompletedListCreateSerializer(page, many=True)
+            if page is not None
+            else CompletedListCreateSerializer(completions, many=True)
+        )
+        return (
+            paginator.get_paginated_response(serializer.data)
+            if page is not None
+            else Response(serializer.data)
+        )
 
 
 class MeViewSet(generics.RetrieveUpdateAPIView):

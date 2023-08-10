@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import *
+from .models import Gym, Review
 
 
 class GymSerializer(serializers.ModelSerializer):
