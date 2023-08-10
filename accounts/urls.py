@@ -1,7 +1,15 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import *
-from . import views
+
+from .oauth import (
+    google_login,
+    google_callback,
+    GoogleLogin,
+    kakao_login,
+    kakao_callback,
+    KakaoLogin,
+)
+from .views import ProfileViewSet, MeViewSet
 
 app_name = "accounts"
 
@@ -18,11 +26,11 @@ urlpatterns = [
         GoogleLogin.as_view(),
         name="google_login_todjango",
     ),
-    path("accounts/kakao/login/", views.kakao_login, name="kakao_login"),
-    path("accounts/kakao/login/callback/", views.kakao_callback, name="kakao_callback"),
+    path("accounts/kakao/login/", kakao_login, name="kakao_login"),
+    path("accounts/kakao/login/callback/", kakao_callback, name="kakao_callback"),
     path(
         "accounts/kakao/login/finish/",
-        views.KakaoLogin.as_view(),
+        KakaoLogin.as_view(),
         name="kakao_login_todjango",
     ),
 ]
