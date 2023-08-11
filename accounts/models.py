@@ -11,7 +11,7 @@ class Profile(BaseModel):
         ("TRAINER", _("TRAINER")),
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    intro = models.CharField(max_length=100)
+    intro = models.CharField(max_length=100, blank=True)
     following = models.ManyToManyField(
         "self", related_name="followers", symmetrical=False, blank=True
     )
