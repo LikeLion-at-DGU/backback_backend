@@ -17,7 +17,7 @@ class Profile(BaseModel):
     )
     type = models.CharField(max_length=15, choices=TYPE_CHOICES)
     nickname = models.CharField(max_length=15)
-    info = models.JSONField(default={})
+    info = models.JSONField(default={}, blank=True)
 
 
 class ProfileReport(ReportBaseModel):
