@@ -74,16 +74,10 @@ class Completed(BaseModel):
 def Create_CompletedCount(sender, instance, created, **kwargs):
     today = timezone.now().date()
     if created:
-        completed = Completed.objects.filter(writer=instance.writer).exclude(
-            id=instance.id
+        completed = Completed.objects.filter(
+            writer=instance.writer, created_at__date=today
         )
-        if completed.exists():
-            is_first = completed.latest("created_at")
-            print(is_first.created_at.date())
-            if is_first.created_at.date() != today:
-                instance.writer.profile.completed_cnt += 1
-                instance.writer.profile.save()
-        else:
+        if completed.count() == 1:
             instance.writer.profile.completed_cnt += 1
             instance.writer.profile.save()
 
@@ -96,10 +90,7 @@ def Delete_Get_CompletedCount(sender, instance, **kwargs):
             writer=instance.writer, created_at__date=today
         )
         if completed.count() == 1:
-            if instance.writer.profile.completed_cnt > 0:
-                instance.writer.profile.completed_cnt -= 1
-            else:
-                instance.writer.profile.completed_cnt = 0
+            instance.writer.profile.completed_cnt -= 1
             instance.writer.profile.save()
 
 
