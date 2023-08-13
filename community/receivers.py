@@ -18,9 +18,10 @@ def create_get_completedcount(sender, instance, created, **kwargs):
 
 @receiver(pre_delete, sender=Completed)
 def delete_get_completedcount(sender, instance, **kwargs):
-    completed = Completed.objects.filter(
-        writer=instance.writer, created_at__date=instance.created_at.date()
-    )
-    if completed.count() == 1:
-        instance.writer.profile.completed_cnt -= 1
-        instance.writer.profile.save()
+    if instance.created_at.month == timezone.now().month:
+        completed = Completed.objects.filter(
+            writer=instance.writer, created_at__date=instance.created_at.date()
+        )
+        if completed.count() == 1:
+            instance.writer.profile.completed_cnt -= 1
+            instance.writer.profile.save()
