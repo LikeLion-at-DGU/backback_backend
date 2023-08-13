@@ -1,10 +1,8 @@
-from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from core.models import ReportBaseModel, BaseModel
 from django.utils.translation import gettext_lazy as _
-from django.db.models.signals import post_save, pre_delete
 
 
 class Exercise(BaseModel):
@@ -68,30 +66,6 @@ class Completed(BaseModel):
     content = models.CharField(max_length=500)
     image = models.ImageField(upload_to=completions_image_upload_path)
     is_private = models.BooleanField(default=False)
-
-
-@receiver(post_save, sender=Completed)
-def Create_CompletedCount(sender, instance, created, **kwargs):
-    today = timezone.now().date()
-    if created:
-        completed = Completed.objects.filter(
-            writer=instance.writer, created_at__date=today
-        )
-        if completed.count() == 1:
-            instance.writer.profile.completed_cnt += 1
-            instance.writer.profile.save()
-
-
-@receiver(pre_delete, sender=Completed)
-def Delete_Get_CompletedCount(sender, instance, **kwargs):
-    today = timezone.now().date()
-    if instance.created_at.date() == today:
-        completed = Completed.objects.filter(
-            writer=instance.writer, created_at__date=today
-        )
-        if completed.count() == 1:
-            instance.writer.profile.completed_cnt -= 1
-            instance.writer.profile.save()
 
 
 class CompletedReport(ReportBaseModel):
