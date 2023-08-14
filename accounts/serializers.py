@@ -15,6 +15,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "info",
             "following_cnt",
             "follower_cnt",
+            "completed_cnt",
             "type",
             "user_id",
         ]
@@ -23,6 +24,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "info",
             "following_cnt",
             "follower_cnt",
+            "completed_cnt",
             "type",
             "user_id",
         ]

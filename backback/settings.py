@@ -60,6 +60,11 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "allauth.socialaccount.providers.kakao",
+    "django_crontab",
+]
+
+CRONJOBS = [
+    ("0 0 * * *", "accounts.crons.reset_completed_cnt"),
 ]
 
 SITE_ID = 1

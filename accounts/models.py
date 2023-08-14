@@ -18,6 +18,7 @@ class Profile(BaseModel):
     type = models.CharField(max_length=15, choices=TYPE_CHOICES)
     nickname = models.CharField(max_length=15)
     info = models.JSONField(default={})
+    completed_cnt = models.IntegerField(default=0)
 
 
 class ProfileReport(ReportBaseModel):
