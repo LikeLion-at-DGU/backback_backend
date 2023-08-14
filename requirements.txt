@@ -19,6 +19,7 @@ geographiclib==2.0
 haversine==2.8.0
 idna==3.4
 mypy-extensions==1.0.0
+mysqlclient==2.2.0
 oauthlib==3.2.2
 packaging==23.1
 pathspec==0.11.2
