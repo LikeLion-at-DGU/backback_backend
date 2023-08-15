@@ -85,7 +85,13 @@ SIMPLE_JWT = {
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "accounts.authentications.BackBackAuthentication",
-    )
+    ),
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",)
+    if not DEBUG
+    else (
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ),
 }
 
 MIDDLEWARE = [
@@ -97,13 +103,19 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "accounts.middleware.AdminJWTMiddleware",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:3000",
-    "http://localhost:3000",
-]
+CORS_ALLOWED_ORIGINS = (
+    ["http://www.ulkkeunbulkkeun.site"]
+    + [
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+    ]
+    if DEBUG
+    else []
+)
 
 
 ROOT_URLCONF = "backback.urls"
@@ -177,12 +189,15 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 MEDIA_URL = "/media/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+BASE_URL = os.getenv("BASE_URL")

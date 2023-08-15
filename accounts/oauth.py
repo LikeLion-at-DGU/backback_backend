@@ -18,8 +18,8 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 
 BASE_URL = os.getenv("BASE_URL")
-GOOGLE_CALLBACK_URI = BASE_URL + "api/accounts/google/login/callback/"
-KAKAO_CALLBACK_URI = BASE_URL + "api/accounts/kakao/login/callback/"
+GOOGLE_CALLBACK_URI = BASE_URL + "/api/accounts/google/login/callback/"
+KAKAO_CALLBACK_URI = BASE_URL + "/api/accounts/kakao/login/callback/"
 
 
 def google_login(request):
@@ -80,7 +80,7 @@ def google_callback(request):
 
         data = {"access_token": access_token, "code": code}
         accept = requests.post(
-            f"{BASE_URL}api/accounts/google/login/finish/", data=data
+            f"{BASE_URL}/api/accounts/google/login/finish/", data=data
         )
         accept_status = accept.status_code
         if accept_status != 200:
@@ -89,7 +89,7 @@ def google_callback(request):
     except User.DoesNotExist:
         data = {"access_token": access_token, "code": code}
         accept = requests.post(
-            f"{BASE_URL}api/accounts/google/login/finish/", data=data
+            f"{BASE_URL}/api/accounts/google/login/finish/", data=data
         )
         accept_status = accept.status_code
         if accept_status != 200:
