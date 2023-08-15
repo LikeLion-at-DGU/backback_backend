@@ -16,6 +16,7 @@ django-filter==23.2
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 geographiclib==2.0
+gunicorn==21.2.0
 haversine==2.8.0
 idna==3.4
 mypy-extensions==1.0.0
