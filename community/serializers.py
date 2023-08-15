@@ -1,5 +1,7 @@
 from ssl import Purpose
 from tokenize import Comment
+
+from django.conf import settings
 from rest_framework import serializers
 from core.serializers import WriterSerializer
 from .models import Banner, Completed, Exercise, Post, PostImage, Scrap
@@ -94,8 +96,12 @@ class PostDetailSerializer(serializers.ModelSerializer):
         return False
 
     def get_images(self, obj):
-        image = obj.images.all()
-        return PostImageSerializer(instance=image, many=True, context=self.context).data
+        images = obj.images.all()
+        image_urls = [
+            settings.BASE_URL + settings.MEDIA_URL + str(image.image)
+            for image in images
+        ]
+        return image_urls
 
     def create(self, validated_data):
         user = self.context["request"].user
@@ -106,7 +112,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
 
         instance = Post.objects.create(**validated_data)
         image_set = self.context["request"].FILES
-        for image_data in image_set.getlist("image"):
+        for image_data in image_set.getlist("images"):
             PostImage.objects.create(post=instance, image=image_data)
         return instance
 
