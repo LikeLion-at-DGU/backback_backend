@@ -5,6 +5,7 @@ from .models import Profile
 class ProfileSerializer(serializers.ModelSerializer):
     following_cnt = serializers.SerializerMethodField(read_only=True)
     follower_cnt = serializers.SerializerMethodField(read_only=True)
+    joined_at = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Profile
@@ -18,6 +19,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "completed_cnt",
             "type",
             "user_id",
+            "joined_at",
         ]
         read_only_fields = [
             "id",
@@ -34,3 +36,6 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_follower_cnt(self, instance):
         return instance.followers.count()
+
+    def get_joined_at(self, instance):
+        return instance.user.date_joined.strftime("%Y-%m")
