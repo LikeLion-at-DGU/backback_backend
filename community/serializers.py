@@ -1,10 +1,9 @@
 from ssl import Purpose
-from tokenize import Comment
 
 from django.conf import settings
 from rest_framework import serializers
 from core.serializers import WriterSerializer
-from .models import Banner, Completed, Exercise, Post, PostImage, Scrap
+from .models import Banner, Completed, Exercise, Post, PostImage, Scrap, Comment
 
 
 class PostImageSerializer(serializers.ModelSerializer):

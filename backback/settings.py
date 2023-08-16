@@ -107,15 +107,11 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = (
-    ["http://www.ulkkeunbulkkeun.site"]
-    + [
-        "http://127.0.0.1:3000",
-        "http://localhost:3000",
-    ]
-    if DEBUG
-    else []
-)
+CORS_ALLOWED_ORIGINS = [
+    "http://www.ulkkeunbulkkeun.site",
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
+]
 
 
 ROOT_URLCONF = "backback.urls"
