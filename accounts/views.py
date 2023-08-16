@@ -1,10 +1,16 @@
+import re
+from calendar import monthrange
+from datetime import datetime
+
 from django.contrib.auth.models import User
+from django.db.models.functions import ExtractDay
 from rest_framework import viewsets, mixins, generics
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from .models import Profile, ProfileReport
 from accounts.serializers import ProfileSerializer
@@ -72,19 +78,28 @@ class ProfileViewSet(
 
     @action(["GET"], detail=True, url_path="completions")
     def completions(self, request, pk=None):
-        completions = Completed.objects.filter(writer__id=pk)
-        paginator = AccountsPagination()
-        page = paginator.paginate_queryset(completions, request)
-        serializer = (
-            CompletedListCreateSerializer(page, many=True)
-            if page is not None
-            else CompletedListCreateSerializer(completions, many=True)
+        qrange = self.request.query_params.get("range", None)
+        if qrange is None or not re.match(r"\d{4}-\d{2}", qrange):
+            raise ValidationError("쿼리 파라미터가 없거나 유효하지 않은 쿼리 파라미터입니다.")
+
+        year, month = map(int, qrange.split("-"))
+        _, last_day = monthrange(year, month)
+        start_date = datetime(year, month, 1)
+        end_date = datetime(year, month, last_day, 23, 59, 59)
+
+        posts_count_by_day = (
+            Completed.objects.filter(
+                created_at__gte=start_date, created_at__lte=end_date, writer_id=pk
+            )
+            .annotate(day=ExtractDay("created_at"))
+            .values("day", "id")
         )
-        return (
-            paginator.get_paginated_response(serializer.data)
-            if page is not None
-            else Response(serializer.data)
-        )
+
+        post_count_list = [0] * last_day
+        for data in posts_count_by_day:
+            post_count_list[data["day"] - 1] = data["id"]
+
+        return Response({"post_counts": post_count_list})
 
 
 class MeViewSet(generics.RetrieveUpdateAPIView):
