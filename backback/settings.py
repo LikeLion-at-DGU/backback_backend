@@ -200,3 +200,4 @@ MEDIA_URL = "/media/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 BASE_URL = os.getenv("BASE_URL")
+BASE_API_URL = os.getenv("BASE_API_URL")

@@ -3,6 +3,7 @@ from json import JSONDecodeError
 import json
 import os
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 import requests
@@ -17,9 +18,9 @@ from django.utils.crypto import get_random_string
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 
-BASE_URL = os.getenv("BASE_URL")
-GOOGLE_CALLBACK_URI = BASE_URL + "/api/accounts/google/login/callback/"
-KAKAO_CALLBACK_URI = BASE_URL + "/api/accounts/kakao/login/callback/"
+BASE_API_URL = settings.BASE_API_URL
+GOOGLE_CALLBACK_URI = BASE_API_URL + "/accounts/google/login/callback/"
+KAKAO_CALLBACK_URI = BASE_API_URL + "/accounts/kakao/login/callback/"
 
 
 def google_login(request):
@@ -80,7 +81,7 @@ def google_callback(request):
 
         data = {"access_token": access_token, "code": code}
         accept = requests.post(
-            f"{BASE_URL}/api/accounts/google/login/finish/", data=data
+            f"{BASE_API_URL}/accounts/google/login/finish/", data=data
         )
         accept_status = accept.status_code
         if accept_status != 200:
@@ -89,7 +90,7 @@ def google_callback(request):
     except User.DoesNotExist:
         data = {"access_token": access_token, "code": code}
         accept = requests.post(
-            f"{BASE_URL}/api/accounts/google/login/finish/", data=data
+            f"{BASE_API_URL}/accounts/google/login/finish/", data=data
         )
         accept_status = accept.status_code
         if accept_status != 200:
@@ -102,12 +103,12 @@ def google_callback(request):
     user = User.objects.get(email=email)
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)
-    response_data = {
-        "message": "Login Success",
-        "access_token": access_token,
-        "refresh_token": str(refresh),
-    }
-    response = JsonResponse(response_data)
+    # response_data = {
+    #     "message": "Login Success",
+    #     "access_token": access_token,
+    #     "refresh_token": str(refresh),
+    # }
+    response = redirect("/")
     response.set_cookie("access_token", access_token, max_age=60 * 60 * 24 * 14)
     return response
 
@@ -176,7 +177,9 @@ def kakao_callback(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         data = {"access_token": access_token, "code": code}
-        accept = requests.post(f"{BASE_URL}api/accounts/kakao/login/finish/", data=data)
+        accept = requests.post(
+            f"{BASE_API_URL}/accounts/kakao/login/finish/", data=data
+        )
         accept_status = accept.status_code
         if accept_status != 200:
             return JsonResponse({"err_msg": "failed to signin"}, status=accept_status)
@@ -198,12 +201,12 @@ def kakao_callback(request):
     user = User.objects.get(username=username)
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)
-    response_data = {
-        "message": "Login Susccess",
-        "access_token": access_token,
-        "refresh_token": str(refresh),
-    }
-    response = JsonResponse(response_data)
+    # response_data = {
+    #     "message": "Login Susccess",
+    #     "access_token": access_token,
+    #     "refresh_token": str(refresh),
+    # }
+    response = redirect("/")
     response.set_cookie("access_token", access_token, max_age=60 * 60 * 24 * 14)
     return response
 
