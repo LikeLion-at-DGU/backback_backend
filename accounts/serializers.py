@@ -6,6 +6,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     following_cnt = serializers.SerializerMethodField(read_only=True)
     follower_cnt = serializers.SerializerMethodField(read_only=True)
     joined_at = serializers.SerializerMethodField(read_only=True)
+    is_follwed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Profile
@@ -21,6 +22,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "user_id",
             "joined_at",
             "level",
+            "is_follwed",
         ]
         read_only_fields = [
             "id",
@@ -41,3 +43,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_joined_at(self, instance):
         return instance.user.date_joined.strftime("%Y-%m")
+
+    def get_is_follwed(self, instance):
+        request = self.context.get("request")
+        if request is None or not request.user.is_authenticated:
+            return False
+        return instance in request.user.profile.following.all()
