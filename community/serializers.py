@@ -181,7 +181,7 @@ class CompletedSerializer(serializers.ModelSerializer):
 
     def get_is_liked(self, instance):
         if (user := self.context["request"].user).is_authenticated:
-            return instance.reactions.filter(completed__isnull=True, user=user).exists()
+            return instance.reactions.filter(post__isnull=True, user=user).exists()
         return False
 
 
