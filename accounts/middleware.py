@@ -10,7 +10,10 @@ class AdminJWTMiddleware:
             refresh = RefreshToken.for_user(request.user)
             token = str(refresh.access_token)
             response = self.get_response(request)
-            response.set_cookie("access_token", token, max_age=60 * 60 * 24 * 14)
+            response.set_cookie(
+                "access_token", token, max_age=60 * 60 * 24 * 14, httponly=True
+            )
+            response.set_cookie("uid", request.user.id, max_age=60 * 60 * 24 * 14)
             return response
 
         return self.get_response(request)
