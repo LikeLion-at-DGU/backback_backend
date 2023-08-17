@@ -12,6 +12,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
+from rest_framework.views import APIView
+
 from .models import Profile, ProfileReport
 from accounts.serializers import ProfileSerializer
 from community.models import Post, Completed
@@ -130,3 +132,25 @@ class MeViewSet(generics.RetrieveUpdateAPIView):
 
         serializer = self.get_serializer(instance.profile)
         return Response(serializer.data)
+
+
+class UserLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        response = Response()
+        response.delete_cookie("access_token")
+        response.delete_cookie("uid")
+        return response
+
+
+class UserLeaveView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        response = Response(status=status.HTTP_204_NO_CONTENT)
+        response.delete_cookie("access_token")
+        response.delete_cookie("uid")
+        user = request.user
+        user.delete()
+        return response

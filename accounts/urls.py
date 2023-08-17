@@ -9,7 +9,7 @@ from .oauth import (
     kakao_callback,
     KakaoLogin,
 )
-from .views import ProfileViewSet, MeViewSet
+from .views import ProfileViewSet, MeViewSet, UserLogoutView, UserLeaveView
 
 app_name = "accounts"
 
@@ -33,4 +33,6 @@ urlpatterns = [
         KakaoLogin.as_view(),
         name="kakao_login_todjango",
     ),
+    path("logout", UserLogoutView.as_view(), name="logout"),
+    path("leave", UserLeaveView.as_view(), name="leave"),
 ]
