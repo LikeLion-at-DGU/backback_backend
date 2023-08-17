@@ -28,7 +28,7 @@ class PurposeSerializer(serializers.ModelSerializer):
 
 class PostListSerializer(serializers.ModelSerializer):
     writer = WriterSerializer(read_only=True)
-    likes_cnt = serializers.IntegerField(read_only=True)
+    likes_cnt = serializers.SerializerMethodField(read_only=True)
     comments_cnt = serializers.SerializerMethodField()
     content = serializers.CharField(write_only=True)
     content_short = serializers.SerializerMethodField()
@@ -57,10 +57,13 @@ class PostListSerializer(serializers.ModelSerializer):
     def get_comments_cnt(self, instance):
         return instance.comments.count()
 
+    def get_likes_cnt(self, instance):
+        return instance.reactions.count()
+
 
 class PostDetailSerializer(serializers.ModelSerializer):
     writer = WriterSerializer(read_only=True)
-    likes_cnt = serializers.IntegerField(read_only=True)
+    likes_cnt = serializers.SerializerMethodField(read_only=True)
     images = serializers.SerializerMethodField(read_only=True)
     is_clipped = serializers.SerializerMethodField(read_only=True)
     comments_cnt = serializers.SerializerMethodField(read_only=True)
@@ -88,6 +91,9 @@ class PostDetailSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "view_cnt",
         ]
+
+    def get_likes_cnt(self, instance):
+        return instance.reactions.count()
 
     def get_is_liked(self, instance):
         if (user := self.context["request"].user).is_authenticated:
