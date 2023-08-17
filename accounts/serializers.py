@@ -20,6 +20,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "type",
             "user_id",
             "joined_at",
+            "level",
         ]
         read_only_fields = [
             "id",
@@ -29,6 +30,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "completed_cnt",
             "type",
             "user_id",
+            "level",
         ]
 
     def get_following_cnt(self, instance):
