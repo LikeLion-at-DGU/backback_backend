@@ -20,6 +20,12 @@ class Profile(BaseModel):
     info = models.JSONField(default={})
     completed_cnt = models.IntegerField(default=0)
 
+    @property
+    def level(self):
+        level = self.completed_cnt // 3 + 1
+        level = 5 if (level > 5) else level
+        return level
+
 
 class ProfileReport(ReportBaseModel):
     profile = models.ForeignKey(
