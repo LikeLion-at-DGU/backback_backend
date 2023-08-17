@@ -108,7 +108,7 @@ def google_callback(request):
     #     "access_token": access_token,
     #     "refresh_token": str(refresh),
     # }
-    response = redirect("/")
+    response = redirect(settings.BASE_URL)
     response.set_cookie(
         "access_token", access_token, max_age=60 * 60 * 24 * 14, httponly=True
     )
@@ -209,7 +209,7 @@ def kakao_callback(request):
     #     "access_token": access_token,
     #     "refresh_token": str(refresh),
     # }
-    response = redirect("/")
+    response = redirect(settings.BASE_URL)
     response.set_cookie(
         "access_token", access_token, max_age=60 * 60 * 24 * 14, httponly=True
     )

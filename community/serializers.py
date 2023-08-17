@@ -64,7 +64,7 @@ class PostListSerializer(serializers.ModelSerializer):
         if instance.images.count() == 0:
             return None
         url = instance.images.first().image.url
-        return settings.BASE_URL + url  # 밑이랑 달라요, url 쓰면 media 딸려서 나옴
+        return settings.BASE_IMAGE_URL + url  # 밑이랑 달라요, url 쓰면 media 딸려서 나옴
 
 
 class PostDetailSerializer(serializers.ModelSerializer):
@@ -109,7 +109,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
     def get_images(self, obj):
         images = obj.images.all()
         image_urls = [
-            settings.BASE_URL + settings.MEDIA_URL + str(image.image)
+            settings.BASE_IMAGE_URL + settings.MEDIA_URL + str(image.image)
             for image in images
         ]
         return image_urls

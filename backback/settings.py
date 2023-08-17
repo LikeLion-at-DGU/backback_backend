@@ -205,3 +205,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 BASE_URL = os.getenv("BASE_URL")
 BASE_API_URL = os.getenv("BASE_API_URL")
+BASE_IMAGE_URL = os.getenv("BASE_IMAGE_URL")
