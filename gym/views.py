@@ -108,8 +108,6 @@ class GymReviewViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
 ):
-    pagination_class = Pagination
-
     def get_serializer_class(self):
         if self.action == "list":
             return ReviewListSerializer

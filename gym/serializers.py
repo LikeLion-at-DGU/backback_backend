@@ -3,7 +3,11 @@ from .models import Gym, Review
 
 
 class GymSerializer(serializers.ModelSerializer):
+    review_cnt = serializers.SerializerMethodField(read_only=True)
     image = serializers.ImageField(use_url=True, required=False)
+
+    def get_review_cnt(self, instance):
+        return instance.reviews.count()
 
     class Meta:
         model = Gym
@@ -16,11 +20,16 @@ class GymSerializer(serializers.ModelSerializer):
             "image",
             "created_at",
             "updated_at",
+            "latitude",
+            "longitude",
+            "review_cnt",
         ]
         read_only_fields = [
             "id",
             "created_at",
             "updated_at",
+            "latitude",
+            "longitude",
         ]
 
 
@@ -70,9 +79,13 @@ class GymListSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "image",
+            "latitude",
+            "longitude",
         ]
         read_only_field = [
             "id",
             "created_at",
             "updated_at",
+            "latitude",
+            "longitude",
         ]
