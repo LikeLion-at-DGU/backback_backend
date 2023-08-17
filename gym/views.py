@@ -43,7 +43,7 @@ class GymViewSet(
     @action(
         ["POST"],
         detail=True,
-        url_path="reports",
+        url_path="report",
         permission_classes=[IsAuthenticated],
     )  # 신고
     def report(self, request, pk):
@@ -86,7 +86,7 @@ class ReviewViewSet(
     @action(
         ["POST"],
         detail=True,
-        url_path="reports",
+        url_path="report",
         permission_classes=[IsAuthenticated],
     )  # 신고
     def report(self, request, pk):
