@@ -52,7 +52,7 @@ class PostListSerializer(serializers.ModelSerializer):
         ]
 
     def get_content_short(self, obj):
-        return obj.content[:50] + "..." if len(obj.content) > 50 else obj.content
+        return obj.content[:88] + "..." if len(obj.content) > 88 else obj.content
 
     def get_comments_cnt(self, instance):
         return instance.comments.count()
