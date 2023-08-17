@@ -298,7 +298,7 @@ class CommentViewSet(mixins.DestroyModelMixin, viewsets.GenericViewSet):
     def get_permissions(self):
         if self.action == "destroy":
             return [IsOwnerOrReadOnly()]
-        elif self.action == "reports":
+        elif self.action == "report":
             return [IsAuthenticated()]
         return []
 
