@@ -110,6 +110,7 @@ def google_callback(request):
     # }
     response = redirect("/")
     response.set_cookie("access_token", access_token, max_age=60 * 60 * 24 * 14)
+    response.set_cookie("uid", user.id, max_age=60 * 60 * 24 * 14)
     return response
 
 
@@ -208,6 +209,7 @@ def kakao_callback(request):
     # }
     response = redirect("/")
     response.set_cookie("access_token", access_token, max_age=60 * 60 * 24 * 14)
+    response.set_cookie("uid", user.id, max_age=60 * 60 * 24 * 14)
     return response
 
 
