@@ -264,7 +264,7 @@ class CompletedViewSet(viewsets.ModelViewSet):
             Reaction.objects.create(completed=completed, user=request.user)
         return Response()
 
-    @action(methods=["PATCH"], detail=True)
+    @action(methods=["PATCH"], detail=True, parser_classes=[JSONParser])
     def private(self, request, pk=None):
         completed = self.get_object()
         completed.is_private = True if completed.is_private == False else False
