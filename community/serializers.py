@@ -32,6 +32,7 @@ class PostListSerializer(serializers.ModelSerializer):
     comments_cnt = serializers.SerializerMethodField()
     content = serializers.CharField(write_only=True)
     content_short = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Post
@@ -46,10 +47,9 @@ class PostListSerializer(serializers.ModelSerializer):
             "likes_cnt",
             "comments_cnt",
             "view_cnt",
+            "image",
         ]
-        read_only_fields = [
-            "view_cnt",
-        ]
+        read_only_fields = ["view_cnt", "image"]
 
     def get_content_short(self, obj):
         return obj.content[:88] + "..." if len(obj.content) > 88 else obj.content
@@ -59,6 +59,12 @@ class PostListSerializer(serializers.ModelSerializer):
 
     def get_likes_cnt(self, instance):
         return instance.reactions.count()
+
+    def get_image(self, instance):
+        if instance.images.count() == 0:
+            return None
+        url = instance.images.first().image.url
+        return settings.BASE_URL + url  # 밑이랑 달라요, url 쓰면 media 딸려서 나옴
 
 
 class PostDetailSerializer(serializers.ModelSerializer):
