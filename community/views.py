@@ -214,9 +214,9 @@ class CompletedViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.action == "list":
-            queryset = Completed.objects.filter(is_private=False)
+            queryset = Completed.objects.filter(is_private=False).order_by("-id")
             return queryset
-        return Completed.objects.all()
+        return Completed.objects.all().order_by("-id")
 
     def get_serializer_class(self):
         if self.action in ["list", "create"]:
