@@ -22,10 +22,20 @@ class Post(BaseModel):
     title = models.CharField(max_length=50)
     content = models.TextField()
     exercise = models.ForeignKey(
-        Exercise, related_name="posts", default="", blank=True, on_delete=models.CASCADE
+        Exercise,
+        related_name="posts",
+        default="",
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
     )
     purpose = models.ForeignKey(
-        Purpose, related_name="posts", default="", blank=True, on_delete=models.CASCADE
+        Purpose,
+        related_name="posts",
+        default="",
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
     )
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, default="ORDINARY")
     view_cnt = models.IntegerField(default=0)
