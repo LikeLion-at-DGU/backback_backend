@@ -65,21 +65,7 @@ python manage.py runserver
 ```
 
 ## 💻 Folder
-```
-📦 backback_BE/        # (1) repositroy_root	
-├─ .gitignore
-├─ .env.example
-├─ LICENSE
-├─ manage.py
-├─ README.md
-├─ requirements.txt
-└─ project			        # (2) project_root
-   ├─ __init__.py
-   ├─ asgi.py
-   ├─ settings.py
-   ├─ urls.py
-   └─ wsgi.py
-```
+
 ```
 📂 backbakc_BE     #  repo root
 ┣  .gitignore
