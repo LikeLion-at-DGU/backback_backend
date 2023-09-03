@@ -2,7 +2,7 @@
 ![header](https://capsule-render.vercel.app/api?type=waving&color=auto&height=300&section=header&text=울끈불끈&fontSize=90&animation=fadeIn&fontAlignY=38&desc=당신을%20위한%20내%20손%20안의%20운동장,%20헬스%20커뮤니티%20"울끈불끈"&descAlignY=58&descAlign=62)
 
 ## 🌠  About Service 울끈불끈
-> 넘쳐 나는 건강과 관련된 정보들 <br>
+> 쏟아지는 건강과 관련된 정보들 <br>
 > 그러나 아무 건강 정보나 믿을 순 없지 않나요? <br>
 > 이제 나에게 맞는 검증된 정보만 얻어가요! <br>
 
@@ -16,7 +16,7 @@
 #### Proudct Designer🎨
 | Name                                         | Major           | Email                |
 | -------------------------------------------- | --------------  | -------------------- |
-| 김재니   | 동국대학교 정보통신공학과  | kjn3008@dgu.ac.kr |
+| [김재니](https://github.com/kmjenny)   | 동국대학교 정보통신공학과  | kjn3008@dgu.ac.kr |
 
 #### Developer💻
 | Name                                         | Major            | Email                |
