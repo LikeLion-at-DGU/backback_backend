@@ -35,7 +35,6 @@
 Django(DRF)
 
 ## How To Use?
-***
 #### Create and open your venv
 ```
 python -m venv {가상 환경 이름}
