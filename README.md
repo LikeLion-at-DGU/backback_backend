@@ -21,10 +21,10 @@
 #### Developer💻
 | Name                                         | Major            | Email                |
 | -------------------------------------------- | --------------  | ----------------------- |
-| [김재니](https://github.com/kmjenny)   | 동국대학교 정보통신공학과과  | kjn3008@dgu.ac.kr |
+| [김재니](https://github.com/kmjenny)   | 동국대학교 정보통신공학과  | kjn3008@dgu.ac.kr |
 | [김민준](https://github.com/samdolls) | 동국대학교 전자전기공학부     | minjoon927@gmail.com |
 | [박상준](https://github.com/tkdwns414) | 동국대학교 정보통신공학과   | sangjune2000@dgu.ac.kr |
-| [배지현](https://github.com/jihyunniiii) | 동국대학교 정보통신공학과과    | jihyunniiii@gmail.com |
+| [배지현](https://github.com/jihyunniiii) | 동국대학교 정보통신공학과    | jihyunniiii@gmail.com |
 | [윤영서](https://github.com/0seoYun) | 동국대학교 AI융합학부    | ys.yun@dgu.ac.kr |
 | [조민우](https://github.com/minwoo0419) | 동국대학교 정보통신공학과   | ghdl464@naver.com |
 
