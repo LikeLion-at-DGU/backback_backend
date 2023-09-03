@@ -2,18 +2,16 @@
 ![header](https://capsule-render.vercel.app/api?type=waving&color=auto&height=300&section=header&text=울끈불끈&fontSize=90&animation=fadeIn&fontAlignY=38&desc=당신을%20위한%20내%20손%20안의%20운동장,%20헬스%20커뮤니티%20"울끈불끈"&descAlignY=58&descAlign=62)
 
 ## 🌠  About Service 울끈불끈
-***
-> 넘쳐 나는 건강과 관련된 정보들
-> 그러나 아무 건강 정보나 믿을 순 없지 않나요?
-> 이제 나에게 맞는 검증된 정보만 얻어가요!
+> 넘쳐 나는 건강과 관련된 정보들 <br>
+> 그러나 아무 건강 정보나 믿을 순 없지 않나요? <br>
+> 이제 나에게 맞는 검증된 정보만 얻어가요! <br>
 
 
-울끈불끈은 운동 목적/종류 그리고 전문가와 비전문가를 나눈 헬스 커뮤니티예요.
-당신을 위한 내 손 안의 운동장, 헬스 커뮤니티 🎁울끈불끈🎁에서 보아요! ✨
+울끈불끈은 운동 목적/종류 그리고 전문가와 비전문가를 나눈 헬스 커뮤니티예요. <br>
+당신을 위한 내 손 안의 운동장, 헬스 커뮤니티 🎁울끈불끈🎁에서 보아요! ✨ <br>
 
 
 ## 👋 About Team 빽빽
-***
 
 #### Proudct Designer🎨
 | Name                                         | Major           | Email                |
@@ -34,7 +32,6 @@
 
 
 ## 🛠️ Tech
-***
 Django(DRF)
 
 ## How To Use?
@@ -69,7 +66,6 @@ python manage.py runserver
 ```
 
 ## 💻 Folder
-***
 ```
 📦 backback_BE/        # (1) repositroy_root	
 ├─ .gitignore
@@ -108,7 +104,6 @@ python manage.py runserver
 ```
 
 ## 🎯 Commit Convention
-***
 -   feat : 새로운 기능 추가
 -   fix : 버그 수정
 -   docs : 문서 수정
